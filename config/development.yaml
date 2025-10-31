@@ -1,0 +1,204 @@
+# Development Environment Configuration
+
+environment: "development"
+
+# Kafka Configuration
+kafka:
+  bootstrap_servers: "localhost:9092"
+  consumer_group_id: "ccc-dev-group"
+  auto_offset_reset: "earliest"
+  enable_auto_commit: true
+  topics:
+    raw_klines: "raw.klines.1m"
+    raw_orderbook: "raw.orderbook"
+    raw_trades: "raw.trades"
+    raw_social: "raw.social"
+    processed_features: "processed.features"
+    signals: "signals"
+
+# TimescaleDB Configuration
+database:
+  host: "localhost"
+  port: 5432
+  name: "ccc_trading"
+  user: "ccc_user"
+  # Password should be in secrets.env file
+  pool_size: 10
+  max_overflow: 20
+  echo: false  # Set to true for SQL query logging
+
+# Redis Configuration
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  # Password should be in secrets.env file
+  decode_responses: true
+  socket_timeout: 5
+  socket_connect_timeout: 5
+
+# Data Collection Settings
+data_collection:
+  exchanges:
+    - binance
+    - bybit
+    - coinbase
+
+  symbols:
+    # Top liquid pairs for POC
+    - "BTC/USDT"
+    - "ETH/USDT"
+    - "SOL/USDT"
+    - "BNB/USDT"
+    - "XRP/USDT"
+
+  timeframes:
+    - "1m"
+    - "5m"
+    - "15m"
+    - "1h"
+    - "4h"
+    - "1d"
+
+  reconnect_delay: 5  # seconds
+  max_reconnect_attempts: 10
+
+  # Order book depth
+  orderbook_depth: 20
+
+# Technical Indicators Configuration
+indicators:
+  enabled:
+    - "RSI"
+    - "MACD"
+    - "BBands"
+    - "EMA"
+    - "SMA"
+    - "ATR"
+    - "ADX"
+    - "Stochastic"
+    - "MFI"
+    - "OBV"
+
+  # RSI parameters to test
+  rsi:
+    periods: [5, 7, 9, 14, 21, 28]
+
+  # MACD parameters
+  macd:
+    fast_periods: [8, 12, 16]
+    slow_periods: [21, 26, 30]
+    signal_periods: [7, 9, 11]
+
+  # Bollinger Bands
+  bbands:
+    periods: [15, 20, 25]
+    stds: [1.5, 2.0, 2.5, 3.0]
+
+  # Moving Averages
+  ema:
+    periods: [5, 10, 20, 50, 100, 200]
+  sma:
+    periods: [7, 14, 21, 50, 100, 200]
+
+  # ATR
+  atr:
+    periods: [10, 14, 20]
+
+# Backtesting Configuration
+backtesting:
+  initial_capital: 100000  # USD
+  commission: 0.001  # 0.1%
+  slippage: 0.0005  # 0.05%
+  lookback_days: 90
+
+# Phase 2: DVK Engine
+dvk:
+  reoptimization_interval: 3600  # seconds (1 hour)
+  min_trades_for_evaluation: 30
+  performance_metrics:
+    - "sharpe_ratio"
+    - "sortino_ratio"
+    - "win_rate"
+    - "profit_factor"
+    - "max_drawdown"
+
+  # Strategy scoring weights
+  scoring_weights:
+    sharpe_ratio: 0.3
+    win_rate: 0.2
+    profit_factor: 0.25
+    max_drawdown: 0.15
+    consistency: 0.1
+
+# Phase 2: Genetic Programming
+genetic_programming:
+  enabled: false  # Disable for POC, enable later
+  population_size: 500
+  generations: 100
+  mutation_rate: 0.1
+  crossover_rate: 0.7
+  tournament_size: 3
+
+# Phase 3: Risk Management
+risk_management:
+  max_portfolio_risk: 0.10  # 10% of portfolio
+  max_position_risk: 0.02  # 2% per position
+  max_single_asset_allocation: 0.20  # 20%
+  max_sector_allocation: 0.40  # 40%
+
+  # Position sizing
+  position_sizing_method: "volatility_targeting"  # or "fixed", "kelly"
+  target_volatility: 0.005  # 0.5% daily volatility per position
+
+  # Stop loss
+  use_stop_loss: true
+  stop_loss_atr_multiplier: 2.0
+  trailing_stop: true
+
+  # Correlation limits
+  max_correlation: 0.70  # Don't take highly correlated positions
+
+# Phase 4: Execution
+execution:
+  mode: "paper"  # "paper" or "live"
+
+  # Order execution algorithm
+  default_algo: "market"  # "market", "limit", "twap", "vwap"
+
+  # Slippage limits
+  max_acceptable_slippage: 0.002  # 0.2%
+
+  # Smart Order Router
+  smart_router:
+    enabled: false  # Enable when multiple exchanges are integrated
+    route_by: "best_price"  # or "best_liquidity"
+
+# Logging Configuration
+logging:
+  level: "DEBUG"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "json"  # or "text"
+  file: "logs/ccc_dev.log"
+  rotation: "100 MB"
+  retention: "30 days"
+
+# Monitoring
+monitoring:
+  prometheus:
+    enabled: true
+    port: 8000
+
+  health_check:
+    enabled: true
+    port: 8001
+
+  alerts:
+    enabled: false  # Enable in production
+    webhook_url: null
+
+# Feature Store (FEAST)
+feature_store:
+  enabled: false  # Enable after POC
+  online_store: "redis"
+  offline_store: "postgresql"
+  registry: "postgresql"

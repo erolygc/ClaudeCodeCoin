@@ -1,0 +1,163 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "claudecodecoin"
+version = "0.1.0"
+description = "Autonomous Crypto Quantitative Trading System"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Proprietary"}
+authors = [
+    {name = "ClaudeCodeCoin Team", email = "team@example.com"}
+]
+keywords = ["cryptocurrency", "trading", "quantitative", "algorithmic", "machine-learning"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.1",
+    "pydantic>=2.5.0",
+    "ccxt>=4.1.80",
+    "pandas>=2.1.4",
+    "numpy>=1.26.2",
+    "scikit-learn>=1.3.2",
+    "kafka-python>=2.0.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
+    "black>=23.12.1",
+    "flake8>=6.1.0",
+    "mypy>=1.7.1",
+    "isort>=5.13.2",
+    "pre-commit>=3.6.0",
+]
+
+ml = [
+    "xgboost>=2.0.3",
+    "lightgbm>=4.1.0",
+    "optuna>=3.5.0",
+    "deap>=1.4.1",
+]
+
+indicators = [
+    "ta-lib>=0.4.28",
+    "pandas-ta>=0.3.14b",
+]
+
+monitoring = [
+    "prometheus-client>=0.19.0",
+    "grafana-api>=1.0.3",
+]
+
+all = [
+    "claudecodecoin[dev,ml,indicators,monitoring]",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["Phase*", "infrastructure", "tests", "config"]
+namespaces = false
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+follow_imports = "silent"
+
+[[tool.mypy.overrides]]
+module = [
+    "ccxt.*",
+    "backtrader.*",
+    "vectorbt.*",
+    "ta.*",
+    "pandas_ta.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --cov=Phase1_DataBackbone --cov=Phase2_AlphaEngine --cov=Phase3_RiskManagement --cov=Phase4_Execution --cov=Phase5_Analytics"
+testpaths = [
+    "tests",
+]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "e2e: marks tests as end-to-end tests",
+]
+
+[tool.coverage.run]
+source = [
+    "Phase1_DataBackbone",
+    "Phase2_AlphaEngine",
+    "Phase3_RiskManagement",
+    "Phase4_Execution",
+    "Phase5_Analytics",
+]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+precision = 2
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]

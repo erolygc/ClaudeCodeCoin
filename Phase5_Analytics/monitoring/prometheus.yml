@@ -1,0 +1,95 @@
+# Prometheus Configuration for ClaudeCodeCoin
+
+global:
+  scrape_interval: 15s      # How frequently to scrape targets
+  evaluation_interval: 15s   # How frequently to evaluate rules
+  external_labels:
+    cluster: 'claudecodecoin-prod'
+    replica: 'prometheus-1'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - 'alertmanager:9093'
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "alert_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # TimescaleDB metrics (via postgres_exporter)
+  - job_name: 'timescaledb'
+    static_configs:
+      - targets: ['timescaledb:5432']
+    metrics_path: /metrics
+
+  # Kafka metrics (via JMX exporter)
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:9092']
+    metrics_path: /metrics
+
+  # Redis metrics (via redis_exporter)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    metrics_path: /metrics
+
+  # ClaudeCodeCoin Application Metrics
+  # Phase 1: Data Collectors
+  - job_name: 'binance_collector'
+    static_configs:
+      - targets: ['binance-collector:8000']
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # Phase 1: Kafka Consumer (Database Writer)
+  - job_name: 'kafka_consumer'
+    static_configs:
+      - targets: ['kafka-consumer:8000']
+    metrics_path: /metrics
+
+  # Phase 2: Alpha Engine
+  - job_name: 'alpha_engine'
+    static_configs:
+      - targets: ['alpha-engine:8000']
+    metrics_path: /metrics
+
+  # Phase 3: Risk Manager
+  - job_name: 'risk_manager'
+    static_configs:
+      - targets: ['risk-manager:8000']
+    metrics_path: /metrics
+
+  # Phase 4: Execution Engine
+  - job_name: 'execution_engine'
+    static_configs:
+      - targets: ['execution-engine:8000']
+    metrics_path: /metrics
+
+  # Phase 5: Meta-Learning Supervisor
+  - job_name: 'supervisor'
+    static_configs:
+      - targets: ['supervisor:8000']
+    metrics_path: /metrics
+
+  # Node Exporter (System metrics)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    metrics_path: /metrics
+
+# Remote write configuration (for long-term storage)
+# remote_write:
+#   - url: "https://your-remote-storage-url/api/v1/write"
+#     basic_auth:
+#       username: 'your_username'
+#       password: 'your_password'

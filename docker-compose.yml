@@ -1,0 +1,158 @@
+version: '3.8'
+
+services:
+  # Apache Zookeeper (required for Kafka)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.3
+    hostname: zookeeper
+    container_name: ccc-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+    networks:
+      - ccc-network
+
+  # Apache Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.5.3
+    hostname: kafka
+    container_name: ccc-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - ccc-network
+
+  # Kafka UI (for monitoring and management)
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: ccc-kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - ccc-network
+
+  # TimescaleDB (PostgreSQL with time-series extensions)
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: ccc-timescaledb
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ccc_user
+      POSTGRES_PASSWORD: ccc_password_change_in_production
+      POSTGRES_DB: ccc_trading
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - timescaledb-data:/var/lib/postgresql/data
+      - ./Phase1_DataBackbone/storage/timescaledb_schema.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - ccc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ccc_user -d ccc_trading"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (for caching and signal storage)
+  redis:
+    image: redis:7.2-alpine
+    container_name: ccc-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass ccc_redis_password_change_in_production
+    volumes:
+      - redis-data:/data
+    networks:
+      - ccc-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Prometheus (metrics collection)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ccc-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./Phase5_Analytics/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - ccc-network
+
+  # Grafana (visualization)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ccc-grafana
+    depends_on:
+      - prometheus
+      - timescaledb
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin_change_in_production
+      GF_INSTALL_PLUGINS: redis-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./Phase5_Analytics/dashboard/grafana_dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - ccc-network
+
+volumes:
+  zookeeper-data:
+    driver: local
+  zookeeper-logs:
+    driver: local
+  kafka-data:
+    driver: local
+  timescaledb-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  ccc-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16

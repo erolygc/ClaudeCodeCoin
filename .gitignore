@@ -1,0 +1,196 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# PyCharm
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# Environment Variables & Secrets
+secrets.env
+.env
+*.pem
+*.key
+*.p12
+credentials.json
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# Data files
+*.csv
+*.parquet
+*.h5
+*.hdf5
+data/raw/
+data/processed/
+backtest_results/
+
+# Model files
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.pb
+models/saved/
+checkpoints/
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Kubernetes
+secrets/
+*.kubeconfig
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+
+# Grafana
+grafana-data/
+
+# Prometheus
+prometheus-data/
+
+# Mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Scrapy
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# Pyre type checker
+.pyre/
