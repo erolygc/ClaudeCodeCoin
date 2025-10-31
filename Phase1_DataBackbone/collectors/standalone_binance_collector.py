@@ -187,7 +187,8 @@ class StandaloneBinanceCollector:
                     "is_closed": k["x"],
                 }
 
-                # Sadece kapanan mumları kaydet
+                # SADECE kapanan mumları kaydet (her 1 dakikada bir)
+                # Canlı mumları (is_closed=False) kaydetmiyoruz - çok fazla veri olur
                 if k["x"]:
                     # CSV'ye kaydet
                     self._save_to_csv(data)
@@ -202,25 +203,42 @@ class StandaloneBinanceCollector:
                         f"O: {data['open']:.2f} H: {data['high']:.2f} "
                         f"L: {data['low']:.2f} C: {data['close']:.2f} | "
                         f"V: {data['volume']:.2f} | "
-                        f"💾 Saved (Total: {self.messages_saved})"
+                        f"💾 SAVED (Total: {self.messages_saved})"
                     )
 
                     # Her 10 mumda istatistik göster
                     if self.messages_saved % 10 == 0:
                         self._print_stats()
+                else:
+                    # Canlı mum (henüz kapanmamış) - sadece ilk 5'ini göster
+                    if self.messages_received <= 5:
+                        print(
+                            f"🔄 {symbol} {self.interval} | "
+                            f"C: {data['close']:.2f} V: {data['volume']:.2f} | "
+                            f"LIVE (waiting for close...)"
+                        )
 
         except Exception as e:
             self.errors += 1
             print(f"❌ Hata: {e}")
+            import traceback
+            traceback.print_exc()
 
     def _on_error(self, ws, error):
         """WebSocket hatası"""
-        print(f"❌ WebSocket Hatası: {error}")
+        if error:
+            print(f"❌ WebSocket Hatası: {error}")
+            import traceback
+            traceback.print_exc()
         self.errors += 1
 
     def _on_close(self, ws, close_status_code, close_msg):
         """WebSocket kapandı"""
-        print(f"⚠️  WebSocket bağlantısı kapandı: {close_status_code}")
+        print(f"\n⚠️  WebSocket bağlantısı kapandı!")
+        print(f"   Durum Kodu: {close_status_code}")
+        print(f"   Mesaj: {close_msg}")
+        print(f"   Toplam alınan mesaj: {self.messages_received}")
+        print(f"   Kaydedilen mum: {self.messages_saved}")
         self.is_running = False
 
     def _on_open(self, ws):
@@ -232,6 +250,11 @@ class StandaloneBinanceCollector:
         print(f"📊 Database: {self.db_path.name}")
         print("=" * 70)
         print("🔄 Veri toplamaya başlandı... (Durdurmak için Ctrl+C)")
+        print("")
+        print("⏳ ÖNEMLİ: İlk mum kapanana kadar veri KAYDEDİLMEYECEK!")
+        print("   - 1 dakikalık interval için: ~60 saniye bekleyin")
+        print("   - Canlı mumlar 'LIVE' olarak gösterilecek")
+        print("   - Kapanan mumlar 'SAVED' olarak gösterilecek")
         print("=" * 70)
         self.is_running = True
         import time
