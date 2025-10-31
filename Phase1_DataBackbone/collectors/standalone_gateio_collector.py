@@ -203,32 +203,11 @@ class StandaloneGateioCollector:
             if data.get("channel") == "spot.candlesticks" and data.get("event") == "update":
                 result = data.get("result", {})
 
-                # Gate.io kline format: [timestamp, volume, close, high, low, open, ...]
-                kline = result.get("n")  # "n" contains the kline data
-
-                if not kline or len(kline) < 6:
-                    return
-
-                # Parse Gate.io kline data
-                # Format: ["1730380800", "123.45", "69230.75", "69245.00", "69200.12", "69234.50", ...]
-                timestamp_str = kline[0]
-                volume = float(kline[1])
-                close = float(kline[2])
-                high = float(kline[3])
-                low = float(kline[4])
-                open_price = float(kline[5])
-
-                # Symbol from result
-                symbol = result.get("n", ["", ""])[1] if isinstance(result.get("n"), list) else self.symbols[0]
-
-                # Actually the symbol is in the subscription, let's use a different approach
-                # Gate.io sends: {"channel": "spot.candlesticks", "event": "update", "result": {"t": timestamp, "v": volume, "c": close, ...}}
-
-                # Let me reparse - Gate.io format is different
-                # Actually checking Gate.io docs, the format is:
+                # Gate.io candlestick format:
                 # result: {t: timestamp, v: volume, c: close, h: high, l: low, o: open, n: candle_name}
+                # Example: {"t": "1606292580", "v": "2362.32", "c": "19128.1", "h": "19128.1", "l": "19128.1", "o": "19128.1", "n": "1m_BTC_USDT"}
 
-                if "t" in result:
+                if "t" in result and "c" in result:
                     timestamp_str = str(result["t"])
                     open_price = float(result.get("o", 0))
                     high = float(result.get("h", 0))
