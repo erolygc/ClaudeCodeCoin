@@ -75,7 +75,8 @@ class StandaloneBinanceCollector:
                 close REAL,
                 volume REAL,
                 number_of_trades INTEGER,
-                collected_at TEXT
+                collected_at TEXT,
+                exchange TEXT DEFAULT 'binance'
             )
         """)
 
@@ -137,8 +138,8 @@ class StandaloneBinanceCollector:
             INSERT INTO klines (
                 timestamp, datetime, symbol, interval,
                 open, high, low, close, volume,
-                number_of_trades, collected_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                number_of_trades, collected_at, exchange
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (
                 data["timestamp"],
@@ -152,6 +153,7 @@ class StandaloneBinanceCollector:
                 data["volume"],
                 data["number_of_trades"],
                 data["collected_at"],
+                "binance",
             ),
         )
 
