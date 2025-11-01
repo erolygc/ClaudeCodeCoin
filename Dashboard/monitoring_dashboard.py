@@ -156,9 +156,10 @@ def check_collectors_running():
     for proc in psutil.process_iter(['name', 'cmdline']):
         try:
             cmdline = ' '.join(proc.info['cmdline'] or [])
-            if 'standalone_binance_collector.py' in cmdline:
+            # Multi-coin veya standalone collector'ları kontrol et
+            if 'multi_coin_binance_collector.py' in cmdline or 'standalone_binance_collector.py' in cmdline:
                 collectors['binance'] = True
-            if 'standalone_gateio_collector.py' in cmdline:
+            if 'multi_coin_gateio_collector.py' in cmdline or 'standalone_gateio_collector.py' in cmdline:
                 collectors['gateio'] = True
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             pass

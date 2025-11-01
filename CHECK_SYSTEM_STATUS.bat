@@ -15,16 +15,16 @@ if %ERRORLEVEL% EQU 0 (
 echo 📊 Sistem Bileşenleri:
 echo.
 
-REM 1. Binance Collector
-wmic process where "commandline like '%%standalone_binance_collector%%'" get processid 2>nul | find /v "ProcessId" | find /v "" >nul
+REM 1. Binance Collector (Multi-Coin or Standalone)
+wmic process where "commandline like '%%multi_coin_binance_collector%%' or commandline like '%%standalone_binance_collector%%'" get processid 2>nul | find /v "ProcessId" | find /v "" >nul
 if %ERRORLEVEL% EQU 0 (
     echo   ✅ Binance Collector       : ÇALIŞIYOR
 ) else (
     echo   ❌ Binance Collector       : DURDURULDU
 )
 
-REM 2. Gate.io Collector
-wmic process where "commandline like '%%standalone_gateio_collector%%'" get processid 2>nul | find /v "ProcessId" | find /v "" >nul
+REM 2. Gate.io Collector (Multi-Coin or Standalone)
+wmic process where "commandline like '%%multi_coin_gateio_collector%%' or commandline like '%%standalone_gateio_collector%%'" get processid 2>nul | find /v "ProcessId" | find /v "" >nul
 if %ERRORLEVEL% EQU 0 (
     echo   ✅ Gate.io Collector       : ÇALIŞIYOR
 ) else (
@@ -115,10 +115,10 @@ echo.
 
 set RUNNING_COUNT=0
 
-wmic process where "commandline like '%%standalone_binance_collector%%'" get processid 2>nul | find /v "ProcessId" | find /v "" >nul
+wmic process where "commandline like '%%multi_coin_binance_collector%%' or commandline like '%%standalone_binance_collector%%'" get processid 2>nul | find /v "ProcessId" | find /v "" >nul
 if %ERRORLEVEL% EQU 0 set /a RUNNING_COUNT+=1
 
-wmic process where "commandline like '%%standalone_gateio_collector%%'" get processid 2>nul | find /v "ProcessId" | find /v "" >nul
+wmic process where "commandline like '%%multi_coin_gateio_collector%%' or commandline like '%%standalone_gateio_collector%%'" get processid 2>nul | find /v "ProcessId" | find /v "" >nul
 if %ERRORLEVEL% EQU 0 set /a RUNNING_COUNT+=1
 
 wmic process where "commandline like '%%realtime_pump_scanner%%'" get processid 2>nul | find /v "ProcessId" | find /v "" >nul
