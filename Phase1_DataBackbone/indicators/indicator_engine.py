@@ -8,8 +8,16 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from datetime import datetime
 import json
+import sys
+import os
 
-from .basic_indicators import calculate_all_indicators
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+try:
+    from .basic_indicators import calculate_all_indicators
+except ImportError:
+    from basic_indicators import calculate_all_indicators
 
 
 class IndicatorEngine:

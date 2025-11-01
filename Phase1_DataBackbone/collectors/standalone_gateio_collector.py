@@ -143,33 +143,61 @@ class StandaloneGateioCollector:
             f.write(line)
 
     def _save_to_sqlite(self, data):
-        """Veriyi SQLite'a kaydet"""
+        """Veriyi SQLite'a kaydet (duplicate kontrolü ile)"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
+        # Check for duplicate
         cursor.execute(
             """
-            INSERT INTO klines (
-                timestamp, datetime, symbol, interval,
-                open, high, low, close, volume,
-                number_of_trades, collected_at, exchange
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-            (
-                data["timestamp"],
-                data["datetime"],
-                data["symbol"],
-                data["interval"],
-                data["open"],
-                data["high"],
-                data["low"],
-                data["close"],
-                data["volume"],
-                0,  # Gate.io doesn't provide trade count in kline
-                data["collected_at"],
-                "gate.io",
-            ),
+            SELECT id FROM klines
+            WHERE timestamp = ? AND symbol = ? AND exchange = ?
+            """,
+            (data["timestamp"], data["symbol"], "gate.io")
         )
+
+        existing = cursor.fetchone()
+
+        if existing:
+            # Update existing record
+            cursor.execute(
+                """
+                UPDATE klines SET
+                    high = ?, low = ?, close = ?, volume = ?,
+                    collected_at = ?
+                WHERE timestamp = ? AND symbol = ? AND exchange = ?
+                """,
+                (
+                    data["high"], data["low"], data["close"], data["volume"],
+                    data["collected_at"],
+                    data["timestamp"], data["symbol"], "gate.io"
+                )
+            )
+        else:
+            # Insert new record
+            cursor.execute(
+                """
+                INSERT INTO klines (
+                    timestamp, datetime, symbol, interval,
+                    open, high, low, close, volume,
+                    number_of_trades, collected_at, exchange
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    data["timestamp"],
+                    data["datetime"],
+                    data["symbol"],
+                    data["interval"],
+                    data["open"],
+                    data["high"],
+                    data["low"],
+                    data["close"],
+                    data["volume"],
+                    0,  # Gate.io doesn't provide trade count in kline
+                    data["collected_at"],
+                    "gate.io",
+                ),
+            )
 
         conn.commit()
         conn.close()
