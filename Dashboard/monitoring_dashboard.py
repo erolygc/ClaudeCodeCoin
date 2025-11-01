@@ -202,7 +202,7 @@ def main():
     data_limit = st.sidebar.slider("Gösterilecek Bar Sayısı", 50, 500, 100)
 
     # Main content
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Genel Bakış", "📈 Grafikler", "🎯 Stratejiler", "🔧 Sistem"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Genel Bakış", "📈 Grafikler", "🎯 Stratejiler", "🔥 Pump Signals", "🔧 Sistem"])
 
     # TAB 1: Overview
     with tab1:
@@ -550,6 +550,216 @@ def main():
                 st.info("Henüz log dosyası yok")
         else:
             st.info("Log klasörü bulunamadı")
+
+    # TAB 5: Pump Signals
+    with tab5:
+        st.header("🔥 Pump & Dump Detection")
+
+        # Import pump detection engine
+        try:
+            sys.path.insert(0, str(project_root / "Phase6_PumpDetection"))
+            from pump_detection_engine import PumpDetectionEngine, PumpLevel
+
+            # Create engine
+            engine = PumpDetectionEngine(db_path=str(DB_PATH))
+
+            # Sidebar controls
+            st.sidebar.subheader("🔥 Pump Detector Ayarları")
+            scan_exchange = st.sidebar.selectbox("Tarama Exchange", ["gate.io", "binance"], key="pump_exchange")
+            min_confidence = st.sidebar.slider("Minimum Confidence", 30, 90, 50)
+
+            # Analyze selected symbol
+            st.subheader(f"📊 {selected_symbol} Analizi")
+
+            with st.spinner("Pump sinyalleri aranıyor..."):
+                signals = engine.analyze_symbol(selected_symbol, selected_exchange)
+
+            if signals:
+                # Filter by confidence
+                filtered_signals = [s for s in signals if s.confidence >= min_confidence]
+
+                if filtered_signals:
+                    st.success(f"✅ {len(filtered_signals)} pump sinyali tespit edildi!")
+
+                    # Display each signal
+                    for i, signal in enumerate(filtered_signals, 1):
+                        # Color based on level
+                        if signal.level.value == "critical":
+                            color = "🔴"
+                            border_color = "#dc3545"
+                        elif signal.level.value == "high":
+                            color = "🟠"
+                            border_color = "#fd7e14"
+                        elif signal.level.value == "medium":
+                            color = "🟡"
+                            border_color = "#ffc107"
+                        else:
+                            color = "🟢"
+                            border_color = "#28a745"
+
+                        with st.container():
+                            st.markdown(f"""
+                            <div style="border-left: 4px solid {border_color}; padding-left: 1rem; margin: 1rem 0;">
+                                <h4>{color} Sinyal #{i} - {signal.level.value.upper()}</h4>
+                            </div>
+                            """, unsafe_allow_html=True)
+
+                            col1, col2, col3, col4 = st.columns(4)
+
+                            with col1:
+                                st.metric("Confidence", f"{signal.confidence:.1f}%")
+                            with col2:
+                                st.metric("Fiyat Değişimi", f"{signal.price_change_pct:+.2f}%")
+                            with col3:
+                                st.metric("Hacim Değişimi", f"{signal.volume_change_pct:+.1f}%")
+                            with col4:
+                                st.metric("Zaman", f"{signal.time_window_minutes}m")
+
+                            st.info(f"💬 {signal.message}")
+
+                            # Indicators
+                            with st.expander("📊 Detaylı İndikatörler"):
+                                st.json(signal.indicators)
+
+                            st.divider()
+                else:
+                    st.info(f"ℹ️ {min_confidence}% confidence üzerinde sinyal bulunamadı.")
+            else:
+                st.info("✅ Normal piyasa koşulları - Pump sinyali yok.")
+
+            st.divider()
+
+            # Scan all symbols
+            st.subheader("🔍 Tüm Semboller Taraması")
+
+            if st.button("Tüm Coinleri Tara", type="primary"):
+                with st.spinner("Tüm semboller taranıyor... (Bu biraz zaman alabilir)"):
+                    all_results = engine.scan_all_symbols(exchange=scan_exchange)
+
+                if all_results:
+                    st.success(f"✅ {len(all_results)} sembolde pump sinyali bulundu!")
+
+                    # Create summary table
+                    summary_data = []
+                    for symbol, symbol_signals in all_results.items():
+                        for signal in symbol_signals:
+                            if signal.confidence >= min_confidence:
+                                summary_data.append({
+                                    'Sembol': symbol,
+                                    'Seviye': signal.level.value.upper(),
+                                    'Confidence': f"{signal.confidence:.1f}%",
+                                    'Fiyat Değişimi': f"{signal.price_change_pct:+.2f}%",
+                                    'Hacim Değişimi': f"{signal.volume_change_pct:+.1f}%",
+                                    'Mesaj': signal.message[:60] + "..."
+                                })
+
+                    if summary_data:
+                        summary_df = pd.DataFrame(summary_data)
+
+                        # Sort by confidence
+                        summary_df['Confidence_num'] = summary_df['Confidence'].str.rstrip('%').astype(float)
+                        summary_df = summary_df.sort_values('Confidence_num', ascending=False)
+                        summary_df = summary_df.drop('Confidence_num', axis=1)
+
+                        st.dataframe(summary_df, use_container_width=True, hide_index=True)
+
+                        # Top pump coins
+                        st.subheader("🏆 En Yüksek Confidence")
+                        top_3 = summary_df.head(3)
+
+                        cols = st.columns(3)
+                        for idx, (i, row) in enumerate(top_3.iterrows()):
+                            with cols[idx]:
+                                st.metric(
+                                    label=f"#{idx+1} {row['Sembol']}",
+                                    value=row['Confidence'],
+                                    delta=row['Fiyat Değişimi']
+                                )
+                    else:
+                        st.info(f"ℹ️ {min_confidence}% confidence üzerinde sinyal bulunamadı.")
+                else:
+                    st.info("✅ Hiçbir sembolde pump sinyali tespit edilmedi.")
+
+            # Alert history (if exists)
+            st.divider()
+            st.subheader("📜 Alert Geçmişi")
+
+            alert_dir = project_root / "pump_alerts"
+            if alert_dir.exists():
+                alert_files = list(alert_dir.glob("pump_alerts_*.json"))
+                if alert_files:
+                    latest_alert_file = max(alert_files, key=lambda p: p.stat().st_mtime)
+
+                    with open(latest_alert_file, 'r', encoding='utf-8') as f:
+                        import json
+                        alerts = json.load(f)
+
+                    if alerts:
+                        st.info(f"📁 {len(alerts)} alert kaydı bulundu")
+
+                        # Recent alerts (last 10)
+                        recent_alerts = sorted(alerts, key=lambda x: x['timestamp'], reverse=True)[:10]
+
+                        alert_data = []
+                        for alert in recent_alerts:
+                            alert_data.append({
+                                'Zaman': alert['timestamp'].split('T')[1][:8],
+                                'Sembol': alert['symbol'],
+                                'Seviye': alert['level'].upper(),
+                                'Confidence': f"{alert['confidence']:.1f}%",
+                                'Fiyat Δ': f"{alert['price_change_pct']:+.2f}%"
+                            })
+
+                        alert_df = pd.DataFrame(alert_data)
+                        st.dataframe(alert_df, use_container_width=True, hide_index=True)
+                else:
+                    st.info("Henüz alert kaydı yok")
+            else:
+                st.info("Alert klasörü bulunamadı")
+
+            # Help section
+            with st.expander("ℹ️ Pump Detection Nasıl Çalışır?"):
+                st.markdown("""
+                ### 🎯 Tespit Edilen Sinyaller
+
+                1. **Volume Spike (Hacim Patlaması)**
+                   - Normal hacmin 3-10x üzeri
+                   - Aniden artan alım/satım aktivitesi
+
+                2. **Price Surge (Hızlı Fiyat Artışı)**
+                   - 5-15 dakikada %10+ artış
+                   - Momentum göstergeleri
+
+                3. **Volatility Spike (Volatilite Patlaması)**
+                   - ATR'nin 2.5x+ artması
+                   - Fiyat dalgalanmalarının artması
+
+                4. **Coordinated Buying (Koordineli Alım)**
+                   - Ardışık yeşil (yükseliş) barları
+                   - Hacimle birlikte sürekli alım
+
+                ### 📊 Confidence Seviyeleri
+
+                - **🔴 CRITICAL (85%+)**: Çok yüksek pump olasılığı
+                - **🟠 HIGH (70-85%)**: Yüksek pump olasılığı
+                - **🟡 MEDIUM (50-70%)**: Orta pump olasılığı
+                - **🟢 LOW (30-50%)**: Düşük pump olasılığı
+
+                ### ⚠️ Önemli Notlar
+
+                - Pump detection bir **tahmin** sistemidir, %100 doğruluk garantisi yoktur
+                - High confidence bile kesin alım sinyali değildir
+                - Her zaman risk yönetimi kurallarını uygulayın
+                - Dump (düşüş) fazı çok hızlı gerçekleşebilir
+                - Sadece eğitim ve araştırma amaçlıdır
+                """)
+
+        except ImportError as e:
+            st.error("❌ Pump Detection Engine yüklenemedi!")
+            st.info("Phase6_PumpDetection modülünün kurulu olduğundan emin olun.")
+            st.code(str(e))
+        except Exception as e:
+            st.error(f"❌ Hata oluştu: {e}")
 
     # Auto-refresh
     if auto_refresh:
