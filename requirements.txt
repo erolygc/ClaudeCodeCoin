@@ -54,6 +54,8 @@ grafana-api==1.0.3              # Grafana API client
 plotly==5.18.0                  # Interactive visualizations
 matplotlib==3.8.2               # Static plotting
 seaborn==0.13.0                 # Statistical visualizations
+streamlit==1.29.0               # Web dashboard framework
+psutil==5.9.6                   # System and process monitoring
 
 # Infrastructure
 fastapi==0.108.0                # API framework (for internal services)
