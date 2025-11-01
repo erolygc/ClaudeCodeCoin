@@ -256,9 +256,9 @@ def main():
             st.subheader("Detaylı İstatistikler")
 
             display_df = stats_df.copy()
-            display_df['first_bar'] = pd.to_datetime(display_df['first_bar']).dt.strftime('%Y-%m-%d %H:%M')
-            display_df['last_bar'] = pd.to_datetime(display_df['last_bar']).dt.strftime('%Y-%m-%d %H:%M')
-            display_df['last_update'] = pd.to_datetime(display_df['last_update']).dt.strftime('%Y-%m-%d %H:%M:%S')
+            display_df['first_bar'] = pd.to_datetime(display_df['first_bar'], format='ISO8601').dt.strftime('%Y-%m-%d %H:%M')
+            display_df['last_bar'] = pd.to_datetime(display_df['last_bar'], format='ISO8601').dt.strftime('%Y-%m-%d %H:%M')
+            display_df['last_update'] = pd.to_datetime(display_df['last_update'], format='ISO8601').dt.strftime('%Y-%m-%d %H:%M:%S')
 
             # Status column
             def get_status(count):
