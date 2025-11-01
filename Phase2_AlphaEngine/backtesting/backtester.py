@@ -28,7 +28,7 @@ class Backtester:
 
     def __init__(
         self,
-        db_path: str = "data_output/binance_data.db",
+        db_path: str = None,
         initial_capital: float = 10000.0,
         commission: float = 0.001,  # 0.1%
         slippage: float = 0.0005   # 0.05%
@@ -42,6 +42,21 @@ class Backtester:
             commission: Commission per trade (0.001 = 0.1%)
             slippage: Slippage per trade (0.0005 = 0.05%)
         """
+        # Auto-detect project root and database path
+        if db_path is None:
+            # Try to find project root
+            current = Path(__file__).parent
+            for _ in range(5):  # Go up max 5 levels
+                test_path = current / "data_output" / "binance_data.db"
+                if test_path.exists():
+                    db_path = str(test_path)
+                    break
+                current = current.parent
+
+            # Fallback to relative path
+            if db_path is None:
+                db_path = "../../data_output/binance_data.db"
+
         self.db_path = Path(db_path)
         self.initial_capital = initial_capital
         self.commission = commission
