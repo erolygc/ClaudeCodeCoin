@@ -109,7 +109,8 @@ def get_recent_data(symbol="BTC_USDT", exchange="gate.io", limit=100):
 
     if not df.empty:
         df = df.sort_values('timestamp')
-        df['datetime'] = pd.to_datetime(df['datetime'])
+        # Handle both test data format and production ISO8601 format
+        df['datetime'] = pd.to_datetime(df['datetime'], format='mixed', errors='coerce')
 
     return df
 
@@ -257,9 +258,9 @@ def main():
             st.subheader("Detaylı İstatistikler")
 
             display_df = stats_df.copy()
-            display_df['first_bar'] = pd.to_datetime(display_df['first_bar'], format='ISO8601').dt.strftime('%Y-%m-%d %H:%M')
-            display_df['last_bar'] = pd.to_datetime(display_df['last_bar'], format='ISO8601').dt.strftime('%Y-%m-%d %H:%M')
-            display_df['last_update'] = pd.to_datetime(display_df['last_update'], format='ISO8601').dt.strftime('%Y-%m-%d %H:%M:%S')
+            display_df['first_bar'] = pd.to_datetime(display_df['first_bar'], format='mixed', errors='coerce').dt.strftime('%Y-%m-%d %H:%M')
+            display_df['last_bar'] = pd.to_datetime(display_df['last_bar'], format='mixed', errors='coerce').dt.strftime('%Y-%m-%d %H:%M')
+            display_df['last_update'] = pd.to_datetime(display_df['last_update'], format='mixed', errors='coerce').dt.strftime('%Y-%m-%d %H:%M:%S')
 
             # Status column
             def get_status(count):
@@ -895,7 +896,7 @@ def main():
                         display_df['pnl_percent'] = display_df['pnl_percent'].map('{:+.2f}%'.format)
                         display_df['confidence'] = display_df['confidence'].map('{:.1f}%'.format)
                         display_df['duration_minutes'] = display_df['duration_minutes'].map('{:.1f} dk'.format)
-                        display_df['exit_time'] = pd.to_datetime(display_df['exit_time']).dt.strftime('%Y-%m-%d %H:%M')
+                        display_df['exit_time'] = pd.to_datetime(display_df['exit_time'], format='mixed', errors='coerce').dt.strftime('%Y-%m-%d %H:%M')
 
                         # Rename columns
                         display_df.columns = ['Sembol', 'Giriş', 'Çıkış', 'P&L', 'P&L %',
