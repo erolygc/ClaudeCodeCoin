@@ -4,9 +4,9 @@ ClaudeCodeCoin - Trading Pairs Configuration
 Tüm exchange'ler için izlenecek coin listesi
 """
 
-# Binance USDT Pairs - Top Volume Coins
+# Binance USDT Pairs - Comprehensive Coverage (100+ coins)
 BINANCE_SYMBOLS = [
-    # Top 10 Market Cap
+    # === Top 10 Market Cap ===
     "BTCUSDT",      # Bitcoin
     "ETHUSDT",      # Ethereum
     "BNBUSDT",      # Binance Coin
@@ -18,7 +18,7 @@ BINANCE_SYMBOLS = [
     "DOTUSDT",      # Polkadot
     "AVAXUSDT",     # Avalanche
 
-    # Top 20 Volume
+    # === Top 20 Volume ===
     "TRXUSDT",      # Tron
     "LINKUSDT",     # Chainlink
     "ATOMUSDT",     # Cosmos
@@ -29,8 +29,12 @@ BINANCE_SYMBOLS = [
     "FILUSDT",      # Filecoin
     "LDOUSDT",      # Lido DAO
     "NEARUSDT",     # Near Protocol
+    "VETUSDT",      # VeChain
+    "ALGOUSDT",     # Algorand
+    "ICPUSDT",      # Internet Computer
+    "HBARUSDT",     # Hedera
 
-    # High Volatility / Pump Candidates
+    # === High Volatility / Pump Candidates ===
     "SHIBUSDT",     # Shiba Inu
     "PEPEUSDT",     # Pepe
     "ARBUSDT",      # Arbitrum
@@ -41,40 +45,87 @@ BINANCE_SYMBOLS = [
     "TIAUSDT",      # Celestia
     "SEIUSDT",      # Sei
     "RENDERUSDT",   # Render Token
+    "ROSEUSDT",     # Oasis Network
+    "FTMUSDT",      # Fantom
+    "KAVAUSDT",     # Kava
+    "QNTUSDT",      # Quant
 
-    # DeFi Tokens
+    # === DeFi Ecosystem ===
     "AAVEUSDT",     # Aave
     "MKRUSDT",      # Maker
     "COMPUSDT",     # Compound
     "CRVUSDT",      # Curve
     "SNXUSDT",      # Synthetix
+    "SUSHIUSDT",    # SushiSwap
+    "1INCHUSDT",    # 1inch
+    "YFIUSDT",      # Yearn Finance
+    "BALUSDT",      # Balancer
+    "LRCUSDT",      # Loopring
+    "ENJUSDT",      # Enjin
+    "CHZUSDT",      # Chiliz
+    "ZILUSDT",      # Zilliqa
 
-    # Layer 2 & Scaling
+    # === Layer 2 & Scaling ===
     "STXUSDT",      # Stacks
     "IMXUSDT",      # Immutable X
     "RUNEUSDT",     # THORChain
+    "METISUSDT",    # Metis
+    "LDOUSDT",      # Lido DAO
 
-    # New Listings (High Pump Potential)
+    # === AI & Data Tokens (TRENDING!) ===
     "WLDUSDT",      # Worldcoin
     "FETUSDT",      # Fetch.ai
     "AGIXUSDT",     # SingularityNET
     "OCEANUSDT",    # Ocean Protocol
     "GRTUSDT",      # The Graph
+    "ARKMUSDT",     # Arkham
 
-    # Meme Coins (High Volatility)
+    # === Meme Coins (High Volatility) ===
     "FLOKIUSDT",    # Floki
     "BONKUSDT",     # Bonk
+    "WIFUSDT",      # dogwifhat
+    "MEMEUSDT",     # Memecoin
 
-    # Gaming & Metaverse
+    # === Gaming & Metaverse ===
     "SANDUSDT",     # Sandbox
     "MANAUSDT",     # Decentraland
     "AXSUSDT",      # Axie Infinity
     "GALAUSDT",     # Gala
+    "BLURUSDT",     # Blur
+    "ILVUSDT",      # Illuvium
+    "MAGICUSDT",    # Magic (Treasure)
+    "GMTUSDT",      # STEPN
+    "APEUSDT",      # ApeCoin
+
+    # === Privacy & Infrastructure ===
+    "STORJUSDT",    # Storj
+    "ARUSDT",       # Arweave
+    "DASHUSDT",     # Dash
+    "XMRUSDT",      # Monero (if listed)
+    "SCUSDT",       # Siacoin
+
+    # === DePIN (Decentralized Physical Infrastructure) ===
+    "IOTXUSDT",     # IoTeX
+    "HOTUSDT",      # Holo
+
+    # === More Pump Candidates ===
+    "JASMYUSDT",    # JasmyCoin
+    "ONEUSDT",      # Harmony
+    "CKBUSDT",      # Nervos Network
+    "CELOUSDT",     # Celo
+    "FLOWUSDT",     # Flow
+    "THETAUSDT",    # Theta
+    "EGLDUSDT",     # MultiversX (Elrond)
+    "XTZUSDT",      # Tezos
+    "EOSUSDT",      # EOS
+    "NEOUSDT",      # Neo
+    "WAVESUSDT",    # Waves
+    "OMGUSDT",      # OMG Network
 ]
 
-# Gate.io Pairs (underscore format)
+# Gate.io Pairs (underscore format) - Extended Coverage (80+ coins)
 GATEIO_SYMBOLS = [
-    # Top Market Cap
+    # === Top Market Cap ===
     "BTC_USDT",
     "ETH_USDT",
     "SOL_USDT",
@@ -86,7 +137,7 @@ GATEIO_SYMBOLS = [
     "DOT_USDT",
     "AVAX_USDT",
 
-    # High Volume
+    # === High Volume ===
     "TRX_USDT",
     "LINK_USDT",
     "ATOM_USDT",
@@ -96,8 +147,12 @@ GATEIO_SYMBOLS = [
     "XLM_USDT",
     "FIL_USDT",
     "NEAR_USDT",
+    "VET_USDT",
+    "ALGO_USDT",
+    "ICP_USDT",
+    "HBAR_USDT",
 
-    # Pump Candidates
+    # === High Volatility / Pump Candidates ===
     "SHIB_USDT",
     "PEPE_USDT",
     "ARB_USDT",
@@ -106,28 +161,83 @@ GATEIO_SYMBOLS = [
     "SUI_USDT",
     "INJ_USDT",
     "SEI_USDT",
+    "TIA_USDT",
+    "RENDER_USDT",
+    "ROSE_USDT",
+    "FTM_USDT",
+    "KAVA_USDT",
+    "QNT_USDT",
 
-    # DeFi
+    # === DeFi Ecosystem ===
     "AAVE_USDT",
     "MKR_USDT",
     "COMP_USDT",
     "CRV_USDT",
     "SNX_USDT",
+    "SUSHI_USDT",
+    "1INCH_USDT",
+    "YFI_USDT",
+    "BAL_USDT",
+    "LRC_USDT",
+    "ENJ_USDT",
+    "CHZ_USDT",
 
-    # New & Trending
+    # === Layer 2 & Scaling ===
+    "STX_USDT",
+    "IMX_USDT",
+    "RUNE_USDT",
+    "METIS_USDT",
+    "LDO_USDT",
+
+    # === AI & Data (High Demand!) ===
     "WLD_USDT",
     "FET_USDT",
+    "AGIX_USDT",
+    "OCEAN_USDT",
     "GRT_USDT",
+    "ARKM_USDT",
 
-    # Meme Coins
+    # === Meme Coins (Extreme Volatility) ===
     "FLOKI_USDT",
     "BONK_USDT",
+    "WIF_USDT",
+    "MEME_USDT",
 
-    # Gaming
+    # === Gaming & Metaverse ===
     "SAND_USDT",
     "MANA_USDT",
     "AXS_USDT",
     "GALA_USDT",
+    "BLUR_USDT",
+    "ILV_USDT",
+    "MAGIC_USDT",
+    "GMT_USDT",
+    "APE_USDT",
+
+    # === Privacy & Storage ===
+    "STORJ_USDT",
+    "AR_USDT",
+    "DASH_USDT",
+    "SC_USDT",
+
+    # === DePIN Projects ===
+    "IOTX_USDT",
+    "HOT_USDT",
+
+    # === More Altcoins (Pump Potential) ===
+    "JASMY_USDT",
+    "ONE_USDT",
+    "CKB_USDT",
+    "CELO_USDT",
+    "FLOW_USDT",
+    "THETA_USDT",
+    "EGLD_USDT",
+    "XTZ_USDT",
+    "EOS_USDT",
+    "NEO_USDT",
+    "WAVES_USDT",
+    "OMG_USDT",
+    "ZIL_USDT",
 ]
 
 # Volume ve Market Cap Filtreleri
@@ -137,10 +247,26 @@ MIN_MARKET_CAP = 10_000_000  # Minimum $10M market cap
 # Pump Detection İçin Öncelikli Coinler
 # Düşük market cap = yüksek pump potansiyeli
 HIGH_PUMP_POTENTIAL = [
-    "PEPEUSDT", "SHIBUSDT", "FLOKIUSDT", "BONKUSDT",  # Meme coins
-    "ARBUSDT", "OPUSDT", "SUIUSDT", "SEIUSDT",         # New L1/L2
-    "WLDUSDT", "FETUSDT", "AGIXUSDT",                  # AI tokens
-    "GALAUSDT", "SANDUSDT", "AXSUSDT",                 # Gaming
+    # Meme Coins (Extreme Pump Potential)
+    "PEPEUSDT", "SHIBUSDT", "FLOKIUSDT", "BONKUSDT", "WIFUSDT", "MEMEUSDT",
+
+    # New L1/L2 (High Volatility)
+    "ARBUSDT", "OPUSDT", "SUIUSDT", "SEIUSDT", "TIAUSDT", "APTUSDT",
+
+    # AI Tokens (Trending Sector)
+    "WLDUSDT", "FETUSDT", "AGIXUSDT", "ARKMUSDT", "RENDERUSDT",
+
+    # Gaming & Metaverse (Community Driven)
+    "GALAUSDT", "SANDUSDT", "AXSUSDT", "APEUSDT", "GMTUSDT", "BLURUSDT",
+
+    # DeFi (Yield Farming Pumps)
+    "YFIUSDT", "1INCHUSDT", "SUSHIUSDT", "CRVUSDT",
+
+    # Low Cap Altcoins (High Risk/Reward)
+    "JASMYUSDT", "ONEUSDT", "CKBUSDT", "HOTUSDT", "IOTXUSDT",
+
+    # Layer 1 Competitors (Pump on News)
+    "FTMUSDT", "ROSEUSDT", "KAVAUSDT", "NEARUSDT",
 ]
 
 # Collector Ayarları
