@@ -3,14 +3,14 @@ echo ======================================================================
 echo 🚀 ClaudeCodeCoin - Tüm Sistemleri Başlat (MULTI-COIN)
 echo ======================================================================
 echo.
-echo Bu script 50+ COIN için tüm bileşenleri başlatacak:
+echo Bu script 186 COIN için tüm bileşenleri başlatacak:
 echo.
-echo   1️⃣  Binance Multi-Coin Collector (50+ coins)
-echo   2️⃣  Gate.io Multi-Coin Collector (40+ coins)
+echo   1️⃣  Binance Multi-Coin Collector (94 coins)
+echo   2️⃣  Gate.io Multi-Coin Collector (92 coins)
 echo   3️⃣  Real-Time Pump Scanner
 echo   4️⃣  Monitoring Dashboard
 echo.
-echo TOPLAM: 90+ Cryptocurrency izlenecek!
+echo TOPLAM: 186 Cryptocurrency izlenecek!
 echo.
 echo Her bileşen ayrı bir pencerede açılacak.
 echo.
@@ -63,12 +63,12 @@ if not exist config\trading_pairs.py (
 )
 
 REM 1. Binance Multi-Coin Collector
-echo 1️⃣  Binance Multi-Coin Collector başlatılıyor (50+ coins)...
+echo 1️⃣  Binance Multi-Coin Collector başlatılıyor (94 coins)...
 start "ClaudeCodeCoin - Binance Multi-Coin Collector" cmd /k "call venv\Scripts\activate && python Phase1_DataBackbone\collectors\multi_coin_binance_collector.py"
 timeout /t 2 >nul
 
 REM 2. Gate.io Multi-Coin Collector
-echo 2️⃣  Gate.io Multi-Coin Collector başlatılıyor (40+ coins)...
+echo 2️⃣  Gate.io Multi-Coin Collector başlatılıyor (92 coins)...
 start "ClaudeCodeCoin - Gate.io Multi-Coin Collector" cmd /k "call venv\Scripts\activate && python Phase1_DataBackbone\collectors\multi_coin_gateio_collector.py"
 timeout /t 2 >nul
 
@@ -91,13 +91,13 @@ echo.
 echo 📊 Açılan Pencereler:
 echo.
 echo   ✅ Pencere 1: Binance Multi-Coin Collector
-echo      └── 50+ USDT pairs (BTC, ETH, SOL, SHIB, PEPE, ARB, OP, etc.)
+echo      └── 94 USDT pairs (BTC, ETH, SOL, SHIB, PEPE, MEME, WIF, AI tokens, DeFi, Gaming, etc.)
 echo.
 echo   ✅ Pencere 2: Gate.io Multi-Coin Collector
-echo      └── 40+ USDT pairs (BTC, ETH, SOL, meme coins, DeFi, etc.)
+echo      └── 92 USDT pairs (BTC, ETH, SOL, meme coins, DeFi, Gaming, L2, AI, etc.)
 echo.
 echo   ✅ Pencere 3: Pump Scanner
-echo      └── 90+ coin taranıyor, pump detection aktif
+echo      └── 186 coin taranıyor, pump detection aktif
 echo.
 echo   ✅ Pencere 4: Dashboard
 echo      └── http://localhost:8501 adresinde açılacak
@@ -106,13 +106,15 @@ echo ======================================================================
 echo.
 echo 💡 İpuçları:
 echo.
-echo   📊 Toplam coin sayısı: 90+ cryptocurrency
+echo   📊 Toplam coin sayısı: 186 cryptocurrency
 echo.
-echo   🔥 Yüksek pump potansiyeli:
-echo      - Meme coins: SHIB, PEPE, FLOKI, BONK
-echo      - New L1/L2: ARB, OP, SUI, SEI
-echo      - AI tokens: WLD, FET, AGIX
-echo      - Gaming: GALA, SAND, AXS
+echo   🔥 Yüksek pump potansiyeli (36 öncelikli coin):
+echo      - Meme coins: SHIB, PEPE, FLOKI, BONK, WIF, MEME
+echo      - New L1/L2: ARB, OP, SUI, SEI, TIA, APT
+echo      - AI tokens: WLD, FET, AGIX, ARKM, RENDER
+echo      - Gaming: GALA, SAND, AXS, APE, GMT, BLUR
+echo      - DeFi: YFI, 1INCH, SUSHI, CRV
+echo      - Low cap gems: JASMY, ONE, CKB, HOT, IOTX
 echo.
 echo   📈 Veri toplama:
 echo      - İlk 30 dakika: Veri birikiyor
@@ -148,7 +150,7 @@ echo Bu pencereyi kapatabilirsiniz.
 echo Sistemler arka planda çalışmaya devam edecek.
 echo.
 echo ======================================================================
-echo 🔥 90+ COIN İZLENİYOR - PUMP ALERT BEKLENİYOR!
+echo 🔥 186 COIN İZLENİYOR - PUMP ALERT BEKLENİYOR!
 echo ======================================================================
 echo.
 pause
