@@ -203,7 +203,7 @@ def main():
     data_limit = st.sidebar.slider("Gösterilecek Bar Sayısı", 50, 500, 100)
 
     # Main content
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Genel Bakış", "📈 Grafikler", "🎯 Stratejiler", "🔥 Pump Signals", "🔧 Sistem"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📊 Genel Bakış", "📈 Grafikler", "🎯 Stratejiler", "🔥 Pump Signals", "💰 Paper Trading", "🔧 Sistem"])
 
     # TAB 1: Overview
     with tab1:
@@ -479,8 +479,8 @@ def main():
             if df is not None:
                 st.info(f"Mevcut: {len(df)} bar")
 
-    # TAB 4: System
-    with tab4:
+    # TAB 6: System
+    with tab6:
         st.header("🔧 Sistem Durumu")
 
         sys_stats = get_system_stats()
@@ -552,8 +552,8 @@ def main():
         else:
             st.info("Log klasörü bulunamadı")
 
-    # TAB 5: Pump Signals
-    with tab5:
+    # TAB 4: Pump Signals
+    with tab4:
         st.header("🔥 Pump & Dump Detection")
 
         # Import pump detection engine
@@ -761,6 +761,248 @@ def main():
             st.code(str(e))
         except Exception as e:
             st.error(f"❌ Hata oluştu: {e}")
+
+    # TAB 5: Paper Trading
+    with tab5:
+        st.header("💰 Paper Trading - Sanal İşlem Performansı")
+
+        # Import paper trading modules
+        try:
+            sys.path.insert(0, str(project_root / "Phase7_PaperTrading"))
+            from position_manager import PositionManager
+            from performance_tracker import PerformanceTracker
+            import config as pt_config
+
+            # Initialize
+            paper_trades_db = project_root / "data_output" / "paper_trades.db"
+
+            if not paper_trades_db.exists():
+                st.warning("⚠️ Paper trading henüz başlatılmamış!")
+                st.info("Paper trading'i başlatmak için `START_PAPER_TRADING.bat` dosyasını çalıştırın.")
+
+                with st.expander("ℹ️ Paper Trading Nedir?"):
+                    st.markdown(f"""
+                    ### 💰 Sanal Trading Sistemi
+
+                    Paper trading, **gerçek para riski olmadan** gerçek piyasa koşullarında işlem yapmanızı sağlar.
+
+                    **Sistem Özellikleri:**
+                    - 💵 Başlangıç Bakiyesi: ${pt_config.INITIAL_BALANCE:,.0f}
+                    - 📊 Maksimum Pozisyon: {pt_config.MAX_OPEN_POSITIONS} adet
+                    - 🛡️  Stop Loss: {pt_config.STOP_LOSS_PERCENT}%
+                    - 🎯 Take Profit: {pt_config.TAKE_PROFIT_PERCENT['LOW']}-{pt_config.TAKE_PROFIT_PERCENT['CRITICAL']}% (confidence'a göre)
+                    - ⏱️  Otomatik Kapatma: {pt_config.AUTO_CLOSE_AFTER_MINUTES} dakika
+                    - 💸 Trading Fee: {pt_config.TRADING_FEE_PERCENT}%
+
+                    **Nasıl Çalışır:**
+                    1. Pump scanner gerçek zamanlı sinyaller üretir
+                    2. {pt_config.MIN_CONFIDENCE_TO_TRADE}%+ confidence ve {pt_config.MIN_VOLUME_SPIKE}x+ hacim spike varsa pozisyon açar
+                    3. Stop Loss, Take Profit veya timeout'a göre pozisyon kapatır
+                    4. Tüm işlemler kaydedilir ve performans analiz edilir
+                    """)
+            else:
+                # Load performance tracker
+                tracker = PerformanceTracker(str(paper_trades_db))
+                metrics = tracker.calculate_metrics()
+
+                # Portfolio summary
+                st.subheader("📊 Portföy Özeti")
+
+                # Check if position manager can be loaded
+                try:
+                    pm = PositionManager(str(paper_trades_db))
+                    summary = pm.get_portfolio_summary()
+
+                    col1, col2, col3, col4 = st.columns(4)
+
+                    with col1:
+                        balance_color = "normal" if summary['total_pnl'] >= 0 else "inverse"
+                        st.metric(
+                            "Mevcut Bakiye",
+                            f"${summary['balance']:,.2f}",
+                            f"{summary['total_pnl_percent']:+.2f}%",
+                            delta_color=balance_color
+                        )
+
+                    with col2:
+                        st.metric(
+                            "Toplam P&L",
+                            f"${summary['total_pnl']:,.2f}",
+                            f"{summary['total_trades']} işlem"
+                        )
+
+                    with col3:
+                        win_rate_color = "normal" if summary['win_rate'] >= 50 else "inverse"
+                        st.metric(
+                            "Win Rate",
+                            f"{summary['win_rate']:.1f}%",
+                            f"{summary['winning_trades']}/{summary['total_trades']}",
+                            delta_color=win_rate_color
+                        )
+
+                    with col4:
+                        st.metric(
+                            "Açık Pozisyon",
+                            f"{summary['open_positions']}/{pt_config.MAX_OPEN_POSITIONS}"
+                        )
+
+                    st.divider()
+
+                except Exception as e:
+                    st.error(f"Portföy bilgileri yüklenemedi: {e}")
+
+                # Performance metrics
+                if metrics['total_trades'] > 0:
+                    st.subheader("📈 Performans Metrikleri")
+
+                    col1, col2, col3 = st.columns(3)
+
+                    with col1:
+                        st.metric("Ortalama P&L", f"${metrics['avg_pnl']:.2f}")
+                        st.metric("En Büyük Kazanç", f"${metrics['max_win']:.2f}")
+                        st.metric("Ortalama Kazanç", f"${metrics['avg_win']:.2f}")
+
+                    with col2:
+                        st.metric("Ortalama P&L %", f"{metrics['avg_pnl_percent']:.2f}%")
+                        st.metric("En Büyük Kayıp", f"${metrics['max_loss']:.2f}")
+                        st.metric("Ortalama Kayıp", f"${metrics['avg_loss']:.2f}")
+
+                    with col3:
+                        st.metric("Ortalama Süre", f"{metrics['avg_duration']:.1f} dk")
+                        st.metric("Kazanan İşlem", metrics['winning_trades'])
+                        st.metric("Kaybeden İşlem", metrics['losing_trades'])
+
+                    st.divider()
+
+                    # Trade history
+                    st.subheader("📋 İşlem Geçmişi")
+
+                    df = tracker.get_all_trades()
+
+                    if not df.empty:
+                        # Filter options
+                        show_count = st.slider("Gösterilecek İşlem Sayısı", 10, 100, 20)
+
+                        # Display recent trades
+                        display_df = df.head(show_count)[['symbol', 'entry_price', 'exit_price',
+                                                          'pnl', 'pnl_percent', 'confidence',
+                                                          'close_reason', 'duration_minutes', 'exit_time']]
+
+                        # Format columns
+                        display_df['entry_price'] = display_df['entry_price'].map('${:.4f}'.format)
+                        display_df['exit_price'] = display_df['exit_price'].map('${:.4f}'.format)
+                        display_df['pnl'] = display_df['pnl'].map('${:.2f}'.format)
+                        display_df['pnl_percent'] = display_df['pnl_percent'].map('{:+.2f}%'.format)
+                        display_df['confidence'] = display_df['confidence'].map('{:.1f}%'.format)
+                        display_df['duration_minutes'] = display_df['duration_minutes'].map('{:.1f} dk'.format)
+                        display_df['exit_time'] = pd.to_datetime(display_df['exit_time']).dt.strftime('%Y-%m-%d %H:%M')
+
+                        # Rename columns
+                        display_df.columns = ['Sembol', 'Giriş', 'Çıkış', 'P&L', 'P&L %',
+                                            'Confidence', 'Kapanış Sebebi', 'Süre', 'Zaman']
+
+                        st.dataframe(display_df, use_container_width=True, hide_index=True)
+
+                        # Balance history chart
+                        st.subheader("📊 Bakiye Grafiği")
+
+                        balance_df = tracker.get_balance_history()
+
+                        if not balance_df.empty:
+                            fig = go.Figure()
+
+                            fig.add_trace(go.Scatter(
+                                x=balance_df['timestamp'],
+                                y=balance_df['balance'],
+                                mode='lines+markers',
+                                name='Bakiye',
+                                line=dict(color='#1f77b4', width=2)
+                            ))
+
+                            # Add initial balance line
+                            fig.add_hline(
+                                y=pt_config.INITIAL_BALANCE,
+                                line_dash="dash",
+                                line_color="gray",
+                                annotation_text=f"Başlangıç: ${pt_config.INITIAL_BALANCE:,.0f}"
+                            )
+
+                            fig.update_layout(
+                                title="Bakiye Geçmişi",
+                                xaxis_title="Zaman",
+                                yaxis_title="Bakiye ($)",
+                                height=400,
+                                hovermode='x unified'
+                            )
+
+                            st.plotly_chart(fig, use_container_width=True)
+
+                        # Performance by symbol
+                        if metrics.get('pnl_by_symbol'):
+                            st.subheader("🏆 Sembol Bazlı Performans")
+
+                            pnl_data = pd.DataFrame({
+                                'Sembol': list(metrics['pnl_by_symbol'].keys()),
+                                'P&L': list(metrics['pnl_by_symbol'].values())
+                            }).sort_values('P&L', ascending=False)
+
+                            # Color based on P&L
+                            colors = ['green' if x > 0 else 'red' for x in pnl_data['P&L']]
+
+                            fig = go.Figure(go.Bar(
+                                x=pnl_data['Sembol'],
+                                y=pnl_data['P&L'],
+                                marker_color=colors,
+                                text=pnl_data['P&L'].map('${:.2f}'.format),
+                                textposition='outside'
+                            ))
+
+                            fig.update_layout(
+                                title="Sembol Bazlı P&L",
+                                xaxis_title="Sembol",
+                                yaxis_title="P&L ($)",
+                                height=400
+                            )
+
+                            st.plotly_chart(fig, use_container_width=True)
+
+                        # Exit reasons
+                        if metrics.get('exit_reasons'):
+                            st.subheader("🚪 Çıkış Sebepleri")
+
+                            exit_data = pd.DataFrame({
+                                'Sebep': list(metrics['exit_reasons'].keys()),
+                                'Sayı': list(metrics['exit_reasons'].values())
+                            })
+
+                            fig = go.Figure(go.Pie(
+                                labels=exit_data['Sebep'],
+                                values=exit_data['Sayı'],
+                                hole=0.4
+                            ))
+
+                            fig.update_layout(
+                                title="Pozisyon Kapatma Sebepleri",
+                                height=400
+                            )
+
+                            st.plotly_chart(fig, use_container_width=True)
+
+                    else:
+                        st.info("Henüz tamamlanmış işlem yok")
+
+                else:
+                    st.info("📊 Henüz işlem yapılmamış. Paper trading engine'in çalıştığından emin olun.")
+                    st.markdown("```bash\nSTART_PAPER_TRADING.bat\n```")
+
+        except ImportError as e:
+            st.error("❌ Paper Trading modülleri yüklenemedi!")
+            st.info("Phase7_PaperTrading klasörünün var olduğundan emin olun.")
+            st.code(str(e))
+        except Exception as e:
+            st.error(f"❌ Hata oluştu: {e}")
+            import traceback
+            st.code(traceback.format_exc())
 
     # Auto-refresh
     if auto_refresh:
