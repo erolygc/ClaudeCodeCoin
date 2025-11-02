@@ -24,12 +24,16 @@ from typing import Dict, List, Optional
 import config
 from position_manager import PositionManager
 
+# Logs klasörünü oluştur
+logs_dir = project_root / "logs"
+logs_dir.mkdir(exist_ok=True)
+
 # Logging ayarları
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('logs/paper_trading.log'),
+        logging.FileHandler(logs_dir / 'paper_trading.log'),
         logging.StreamHandler()
     ]
 )
