@@ -121,6 +121,101 @@ BINANCE_SYMBOLS = [
     "NEOUSDT",      # Neo
     "WAVESUSDT",    # Waves
     "OMGUSDT",      # OMG Network
+
+    # === New Layer 2 & Scaling (2024-2025) ===
+    "STRKUSDT",     # Starknet
+    "MANTAUSDT",    # Manta Network
+    "ZKUSDT",       # ZKsync
+    "BEAMXUSDT",    # Beam
+    "ZKSYNCUSDT",   # ZKsync Era
+
+    # === New Meme Coins (High Pump Potential) ===
+    "BOMEUSDT",     # Book of Meme
+    "MYRIAUSDT",    # Myria
+    "ORDIUSDT",     # Ordinals
+    "SATSUSDT",     # Satoshis
+
+    # === AI & Big Data (Trending 2024-2025) ===
+    "TAOLUSDT",     # Bittensor
+    "IQUSDT",       # Everipedia
+    "NMRUSDT",      # Numerai
+
+    # === Gaming & Metaverse (New) ===
+    "RONUSDT",      # Ronin
+    "PIXELUSDT",    # Pixels
+    "PORTALUSDT",   # Portal
+    "XAIUSDT",      # Xai
+    "NFTUSDT",      # APENFT
+    "ACEUSDT",      # Endurance
+
+    # === DeFi 2.0 (New Protocols) ===
+    "JUPUSDT",      # Jupiter
+    "PYTHUSDT",     # Pyth Network
+    "WUSDT",        # Wormhole
+    "PENDLEUSDT",   # Pendle
+    "RDNTUSDT",     # Radiant Capital
+
+    # === RWA (Real World Assets - Hot Sector!) ===
+    "ONDOUSDT",     # Ondo Finance
+    "POLYSUSDT",    # Polymath
+
+    # === More DePIN ===
+    "HNTUSDT",      # Helium
+
+    # === Infrastructure & Oracles ===
+    "CELRUSDT",     # Celer Network
+    "SKLUSDT",      # SKALE
+    "BANDUSDT",     # Band Protocol
+    "ANKRUSDT",     # Ankr
+
+    # === Established Altcoins (Not Yet Added) ===
+    "BCHUSDT",      # Bitcoin Cash
+    "ZECUSDT",      # Zcash
+    "QTUMUSDT",     # Qtum
+    "BATUSDT",      # Basic Attention
+    "ZRXUSDT",      # 0x Protocol
+    "KSMUSDT",      # Kusama
+    "RENUSDT",      # Ren
+    "RSRUSDT",      # Reserve Rights
+    "COTIUSDT",     # COTI
+    "REEFUSDT",     # Reef
+    "KLAYUSDT",     # Klaytn
+    "AUDIOUSDT",    # Audius
+    "ALPHAUSDT",    # Alpha Finance
+    "SFPUSDT",      # SafePal
+    "PERPUSDT",     # Perpetual Protocol
+    "SUPERUSDT",    # SuperFarm
+    "CFXUSDT",      # Conflux
+    "TLMUSDT",      # Alien Worlds
+    "FORTHUSDT",    # Ampleforth
+    "BAKEUSDT",     # BakeryToken
+    "SLPUSDT",      # Smooth Love Potion
+    "C98USDT",      # Coin98
+    "CLVUSDT",      # Clover Finance
+    "QIUSDT",       # BENQI
+    "YGGUSDT",      # Yield Guild Games
+    "BICOUSDT",     # Biconomy
+    "AXLUSDT",      # Axelar
+    "RAREUSDT",     # SuperRare
+    "ENSUSDT",      # Ethereum Name Service
+    "API3USDT",     # API3
+    "IDEXUSDT",     # IDEX
+    "POLYXUSDT",    # Polymesh
+    "GMXUSDT",      # GMX
+    "BLURUSDT",     # Blur (if not duplicate)
+    "BELUSDT",      # Bella Protocol
+    "DUSKUSDT",     # Dusk Network
+    "RVNUSDT",      # Ravencoin
+    "MOVRUSDT",     # Mover
+    "ACHUSDT",      # Alchemy Pay
+    "GLMRUSDT",     # Golem
+    "BTCSTUSDT",    # Bitcoin Standard Hashrate
+    "STPTUSDT",     # STP Network
+    "TRIBEUSDT",    # Tribe
+    "MOBUSDT",      # MobileCoin
+    "VGXUSDT",      # Voyager
+    "CTSIUSDT",     # Cartesi
+    "WNXMUSDT",     # Wrapped NXM
 ]
 
 # Gate.io Pairs (underscore format) - Extended Coverage (80+ coins)
@@ -238,6 +333,93 @@ GATEIO_SYMBOLS = [
     "WAVES_USDT",
     "OMG_USDT",
     "ZIL_USDT",
+
+    # === New Layer 2 & Scaling (2024-2025) ===
+    "STRK_USDT",     # Starknet
+    "MANTA_USDT",    # Manta Network
+    "ZK_USDT",       # ZKsync
+    "BEAMX_USDT",    # Beam
+
+    # === New Meme Coins (High Pump Potential) ===
+    "BOME_USDT",     # Book of Meme
+    "MYRIA_USDT",    # Myria
+    "ORDI_USDT",     # Ordinals
+    "SATS_USDT",     # Satoshis
+
+    # === AI & Big Data (Trending 2024-2025) ===
+    "TAO_USDT",      # Bittensor
+    "IQ_USDT",       # Everipedia
+    "NMR_USDT",      # Numerai
+
+    # === Gaming & Metaverse (New) ===
+    "RON_USDT",      # Ronin
+    "PIXEL_USDT",    # Pixels
+    "PORTAL_USDT",   # Portal
+    "XAI_USDT",      # Xai
+    "NFT_USDT",      # APENFT
+    "ACE_USDT",      # Endurance
+
+    # === DeFi 2.0 (New Protocols) ===
+    "JUP_USDT",      # Jupiter
+    "PYTH_USDT",     # Pyth Network
+    "W_USDT",        # Wormhole
+    "PENDLE_USDT",   # Pendle
+    "RDNT_USDT",     # Radiant Capital
+
+    # === RWA (Real World Assets - Hot Sector!) ===
+    "ONDO_USDT",     # Ondo Finance
+    "POLYX_USDT",    # Polymesh
+
+    # === More DePIN ===
+    "HNT_USDT",      # Helium
+
+    # === Infrastructure & Oracles ===
+    "CELR_USDT",     # Celer Network
+    "SKL_USDT",      # SKALE
+    "BAND_USDT",     # Band Protocol
+    "ANKR_USDT",     # Ankr
+
+    # === Established Altcoins (Not Yet Added) ===
+    "BCH_USDT",      # Bitcoin Cash
+    "ZEC_USDT",      # Zcash
+    "QTUM_USDT",     # Qtum
+    "BAT_USDT",      # Basic Attention
+    "ZRX_USDT",      # 0x Protocol
+    "KSM_USDT",      # Kusama
+    "REN_USDT",      # Ren
+    "RSR_USDT",      # Reserve Rights
+    "COTI_USDT",     # COTI
+    "REEF_USDT",     # Reef
+    "KLAY_USDT",     # Klaytn
+    "AUDIO_USDT",    # Audius
+    "ALPHA_USDT",    # Alpha Finance
+    "SFP_USDT",      # SafePal
+    "PERP_USDT",     # Perpetual Protocol
+    "SUPER_USDT",    # SuperFarm
+    "CFX_USDT",      # Conflux
+    "TLM_USDT",      # Alien Worlds
+    "FORTH_USDT",    # Ampleforth
+    "BAKE_USDT",     # BakeryToken
+    "SLP_USDT",      # Smooth Love Potion
+    "C98_USDT",      # Coin98
+    "CLV_USDT",      # Clover Finance
+    "QI_USDT",       # BENQI
+    "YGG_USDT",      # Yield Guild Games
+    "BICO_USDT",     # Biconomy
+    "AXL_USDT",      # Axelar
+    "RARE_USDT",     # SuperRare
+    "ENS_USDT",      # Ethereum Name Service
+    "API3_USDT",     # API3
+    "IDEX_USDT",     # IDEX
+    "GMX_USDT",      # GMX
+    "BEL_USDT",      # Bella Protocol
+    "DUSK_USDT",     # Dusk Network
+    "RVN_USDT",      # Ravencoin
+    "MOVR_USDT",     # Mover
+    "ACH_USDT",      # Alchemy Pay
+    "GLMR_USDT",     # Golem/Moonbeam
+    "STPT_USDT",     # STP Network
+    "CTSI_USDT",     # Cartesi
 ]
 
 # Volume ve Market Cap Filtreleri
@@ -249,24 +431,34 @@ MIN_MARKET_CAP = 10_000_000  # Minimum $10M market cap
 HIGH_PUMP_POTENTIAL = [
     # Meme Coins (Extreme Pump Potential)
     "PEPEUSDT", "SHIBUSDT", "FLOKIUSDT", "BONKUSDT", "WIFUSDT", "MEMEUSDT",
+    "BOMEUSDT", "ORDIUSDT", "SATSUSDT",  # 2024-2025 New Memes
 
     # New L1/L2 (High Volatility)
     "ARBUSDT", "OPUSDT", "SUIUSDT", "SEIUSDT", "TIAUSDT", "APTUSDT",
+    "STRKUSDT", "MANTAUSDT", "ZKUSDT", "BEAMXUSDT",  # New Layer 2s
 
-    # AI Tokens (Trending Sector)
+    # AI Tokens (Trending Sector - HOT!)
     "WLDUSDT", "FETUSDT", "AGIXUSDT", "ARKMUSDT", "RENDERUSDT",
+    "TAOLUSDT", "NMRUSDT", "IQUSDT",  # New AI Tokens
 
     # Gaming & Metaverse (Community Driven)
     "GALAUSDT", "SANDUSDT", "AXSUSDT", "APEUSDT", "GMTUSDT", "BLURUSDT",
+    "RONUSDT", "PIXELUSDT", "PORTALUSDT", "XAIUSDT",  # New Gaming
 
-    # DeFi (Yield Farming Pumps)
+    # DeFi 2.0 (Yield Farming Pumps)
     "YFIUSDT", "1INCHUSDT", "SUSHIUSDT", "CRVUSDT",
+    "JUPUSDT", "PYTHUSDT", "PENDLEUSDT", "GMXUSDT",  # New DeFi
+
+    # RWA (Real World Assets - 2025 Trend!)
+    "ONDOUSDT", "POLYSUSDT",
 
     # Low Cap Altcoins (High Risk/Reward)
     "JASMYUSDT", "ONEUSDT", "CKBUSDT", "HOTUSDT", "IOTXUSDT",
+    "MYRIAUSDT", "NFTUSDT", "ACEUSDT",  # More Low Caps
 
     # Layer 1 Competitors (Pump on News)
     "FTMUSDT", "ROSEUSDT", "KAVAUSDT", "NEARUSDT",
+    "HNTUSDT", "CELRUSDT",  # More L1s
 ]
 
 # Collector Ayarları
