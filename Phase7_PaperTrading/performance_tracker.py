@@ -8,7 +8,15 @@ import pandas as pd
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List
-import config
+import sys
+
+# Config modülünü import et
+try:
+    from . import config
+except ImportError:
+    # Eğer relative import çalışmazsa, absolute import dene
+    sys.path.insert(0, str(Path(__file__).parent))
+    import config
 
 
 class PerformanceTracker:

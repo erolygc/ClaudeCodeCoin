@@ -8,7 +8,15 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import logging
 from typing import Dict, List, Optional, Tuple
-import config
+import sys
+
+# Config modülünü import et
+try:
+    from . import config
+except ImportError:
+    # Eğer relative import çalışmazsa, absolute import dene
+    sys.path.insert(0, str(Path(__file__).parent))
+    import config
 
 logger = logging.getLogger(__name__)
 

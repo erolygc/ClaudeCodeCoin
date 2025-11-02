@@ -10,6 +10,10 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+# Phase7_PaperTrading klasörünü de ekle
+phase7_path = Path(__file__).parent
+sys.path.insert(0, str(phase7_path))
+
 import time
 import json
 import sqlite3
