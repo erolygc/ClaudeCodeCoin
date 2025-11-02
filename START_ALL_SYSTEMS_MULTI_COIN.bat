@@ -8,7 +8,8 @@ echo.
 echo   1️⃣  Binance Multi-Coin Collector (94 coins)
 echo   2️⃣  Gate.io Multi-Coin Collector (92 coins)
 echo   3️⃣  Real-Time Pump Scanner
-echo   4️⃣  Monitoring Dashboard
+echo   4️⃣  Paper Trading Engine (Sanal Trading)
+echo   5️⃣  Monitoring Dashboard
 echo.
 echo TOPLAM: 186 Cryptocurrency izlenecek!
 echo.
@@ -77,8 +78,13 @@ echo 3️⃣  Pump Scanner başlatılıyor...
 start "ClaudeCodeCoin - Pump Scanner" cmd /k "call venv\Scripts\activate && python Phase6_PumpDetection\realtime_pump_scanner.py"
 timeout /t 2 >nul
 
-REM 4. Dashboard
-echo 4️⃣  Dashboard başlatılıyor...
+REM 4. Paper Trading Engine
+echo 4️⃣  Paper Trading Engine başlatılıyor...
+start "ClaudeCodeCoin - Paper Trading" cmd /k "call venv\Scripts\activate && python Phase7_PaperTrading\paper_trading_engine.py"
+timeout /t 2 >nul
+
+REM 5. Dashboard
+echo 5️⃣  Dashboard başlatılıyor...
 echo    (Browser'da http://localhost:8501 açılacak)
 start "ClaudeCodeCoin - Dashboard" cmd /k "call venv\Scripts\activate && streamlit run Dashboard\monitoring_dashboard.py"
 timeout /t 3 >nul
@@ -99,7 +105,10 @@ echo.
 echo   ✅ Pencere 3: Pump Scanner
 echo      └── 186 coin taranıyor, pump detection aktif
 echo.
-echo   ✅ Pencere 4: Dashboard
+echo   ✅ Pencere 4: Paper Trading Engine
+echo      └── Sanal trading: $10,000 başlangıç bakiyesi, gerçek piyasa koşulları
+echo.
+echo   ✅ Pencere 5: Dashboard
 echo      └── http://localhost:8501 adresinde açılacak
 echo.
 echo ======================================================================
@@ -126,8 +135,15 @@ echo      - Her 60 saniyede TÜM coinleri tarar
 echo      - High pump potential coinlere öncelik verir
 echo      - Alert'ler pump_alerts/ klasörüne kaydedilir
 echo.
+echo   💰 Paper Trading:
+echo      - Başlangıç bakiyesi: $10,000 (sanal)
+echo      - Gerçek piyasa verileri ile işlem yapar
+echo      - Alert'lere göre otomatik pozisyon açar/kapatır
+echo      - Her 30 saniyede alert'leri kontrol eder
+echo.
 echo   📊 Dashboard'da görmek için:
 echo      http://localhost:8501
+echo      └── 💰 Paper Trading sekmesinden işlemleri izleyin
 echo.
 echo   🛑 Tüm sistemleri durdurmak için:
 echo      STOP_ALL_SYSTEMS.bat
@@ -150,7 +166,7 @@ echo Bu pencereyi kapatabilirsiniz.
 echo Sistemler arka planda çalışmaya devam edecek.
 echo.
 echo ======================================================================
-echo 🔥 186 COIN İZLENİYOR - PUMP ALERT BEKLENİYOR!
+echo 🔥 186 COIN İZLENİYOR - PAPER TRADING AKTİF!
 echo ======================================================================
 echo.
 pause
