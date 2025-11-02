@@ -140,6 +140,7 @@ class PaperTradingEngine:
             alert_file = self.alerts_file / f"pump_alerts_{today}.json"
 
             if not alert_file.exists():
+                logger.info(f"ℹ️  Alert dosyası bulunamadı: {alert_file}")
                 return alerts
 
             with open(alert_file, 'r', encoding='utf-8') as f:
@@ -150,6 +151,8 @@ class PaperTradingEngine:
                 else:
                     alerts = data.get('alerts', [])
 
+            logger.info(f"📄 Alert dosyasından {len(alerts)} toplam alert okundu")
+
             # Sadece son 10 dakika içindeki alert'leri al
             recent_alerts = []
             ten_mins_ago = datetime.now() - timedelta(minutes=10)
@@ -159,26 +162,40 @@ class PaperTradingEngine:
                 if alert_time >= ten_mins_ago:
                     recent_alerts.append(alert)
 
+            logger.info(f"⏰ Son 10 dakikada {len(recent_alerts)} alert var")
+
             # Fiyat verisi olmayan coinleri filtrele
             valid_alerts = []
             skipped_coins = []
+            valid_coins = []
 
             for alert in recent_alerts:
                 symbol = alert['symbol']
                 exchange = alert.get('exchange', 'gate.io')
+                confidence = alert.get('confidence', 0)
+                volume_change = alert.get('volume_change_pct', 0)
 
                 if self.check_price_data_available(symbol, exchange):
                     valid_alerts.append(alert)
+                    valid_coins.append(f"{symbol} ({confidence:.0f}%, {volume_change:.0f}%)")
                 else:
                     skipped_coins.append(symbol)
 
-            # Atlanan coinleri logla (tekrarlı mesajları önlemek için sadece benzersizleri)
+            # İşlenecek coinleri göster
+            if valid_coins:
+                logger.info(f"✅ Fiyat verisi VAR ({len(valid_coins)} alert):")
+                for coin_info in valid_coins[:5]:  # İlk 5'ini göster
+                    logger.info(f"   └── {coin_info}")
+                if len(valid_coins) > 5:
+                    logger.info(f"   └── ... ve {len(valid_coins) - 5} tane daha")
+
+            # Atlanan coinleri logla
             if skipped_coins:
                 unique_skipped = list(set(skipped_coins))
                 if len(unique_skipped) <= 5:
-                    logger.debug(f"⏭️  Fiyat verisi yok (atlandı): {', '.join(unique_skipped)}")
+                    logger.info(f"⏭️  Fiyat verisi YOK (atlandı): {', '.join(unique_skipped)}")
                 else:
-                    logger.debug(f"⏭️  {len(unique_skipped)} coin için fiyat verisi yok (atlandı)")
+                    logger.info(f"⏭️  {len(unique_skipped)} coin için fiyat verisi YOK (atlandı)")
 
             return valid_alerts
 
@@ -188,9 +205,11 @@ class PaperTradingEngine:
 
     def should_open_position(self, alert: dict) -> bool:
         """Bu alert için pozisyon açılmalı mı?"""
+        symbol = alert['symbol']
 
         # Minimum confidence kontrolü
         if alert['confidence'] < config.MIN_CONFIDENCE_TO_TRADE:
+            logger.info(f"   ⊘ {symbol}: Confidence çok düşük ({alert['confidence']:.1f}% < {config.MIN_CONFIDENCE_TO_TRADE}%)")
             return False
 
         # Minimum hacim spike kontrolü (volume_change_pct yüzde olarak geliyor)
@@ -200,15 +219,18 @@ class PaperTradingEngine:
             volume_change = 10000.0  # Çok yüksek hacim artışı olarak kabul et
 
         if volume_change < config.MIN_VOLUME_SPIKE:
+            logger.info(f"   ⊘ {symbol}: Volume spike çok düşük ({volume_change:.0f}% < {config.MIN_VOLUME_SPIKE}%)")
             return False
 
         # Bu alert daha önce işlendi mi?
         alert_id = f"{alert['symbol']}_{alert['timestamp']}"
         if alert_id in self.processed_alerts:
+            logger.info(f"   ⊘ {symbol}: Bu alert daha önce işlendi")
             return False
 
         # Zaten bu sembolde açık pozisyon var mı?
         if alert['symbol'] in self.position_manager.open_positions:
+            logger.info(f"   ⊘ {symbol}: Bu coin için zaten açık pozisyon var")
             return False
 
         return True
@@ -218,7 +240,7 @@ class PaperTradingEngine:
         alerts = self.load_recent_alerts()
 
         if not alerts:
-            logger.debug("📭 İşlenecek yeni alert yok")
+            logger.info("📭 İşlenecek yeni alert yok (fiyat verisi veya zaman filtresi)")
             return
 
         logger.info(f"📬 {len(alerts)} yeni alert bulundu (fiyat verisi mevcut olanlar)")
