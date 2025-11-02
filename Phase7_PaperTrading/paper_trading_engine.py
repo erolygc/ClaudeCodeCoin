@@ -140,8 +140,13 @@ class PaperTradingEngine:
         if alert['confidence'] < config.MIN_CONFIDENCE_TO_TRADE:
             return False
 
-        # Minimum hacim spike kontrolü
-        if alert.get('volume_spike', 0) < config.MIN_VOLUME_SPIKE:
+        # Minimum hacim spike kontrolü (volume_change_pct yüzde olarak geliyor)
+        volume_change = alert.get('volume_change_pct', 0)
+        # Sonsuz değerleri kontrol et
+        if volume_change == float('inf') or volume_change == '∞':
+            volume_change = 10000.0  # Çok yüksek hacim artışı olarak kabul et
+
+        if volume_change < config.MIN_VOLUME_SPIKE:
             return False
 
         # Bu alert daha önce işlendi mi?
@@ -170,11 +175,16 @@ class PaperTradingEngine:
                 continue
 
             # Pozisyon aç
+            # volume_change_pct'yi volume_spike olarak kullan
+            volume_change = alert.get('volume_change_pct', 0)
+            if volume_change == float('inf') or volume_change == '∞':
+                volume_change = 10000.0
+
             position = self.position_manager.open_position(
                 symbol=alert['symbol'],
                 entry_price=current_price,
                 confidence=alert['confidence'],
-                volume_spike=alert.get('volume_spike', 0)
+                volume_spike=volume_change
             )
 
             if position:

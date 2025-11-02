@@ -22,7 +22,7 @@ TAKE_PROFIT_PERCENT = {
 
 # Pozisyon Açma Kriterleri
 MIN_CONFIDENCE_TO_TRADE = 50.0  # Minimum %50 confidence gerekli
-MIN_VOLUME_SPIKE = 5.0  # Minimum 5x hacim artışı
+MIN_VOLUME_SPIKE = 500.0  # Minimum %500 hacim artışı (5x)
 
 # Pozisyon Boyutlandırma (Confidence'a göre)
 POSITION_SIZE_MULTIPLIER = {
