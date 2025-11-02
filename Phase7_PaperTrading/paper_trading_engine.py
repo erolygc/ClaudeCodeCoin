@@ -112,7 +112,11 @@ class PaperTradingEngine:
 
             with open(alert_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                alerts = data.get('alerts', [])
+                # Format hem direkt liste hem de dictionary içinde liste olabilir
+                if isinstance(data, list):
+                    alerts = data
+                else:
+                    alerts = data.get('alerts', [])
 
             # Sadece son 10 dakika içindeki alert'leri al
             recent_alerts = []
