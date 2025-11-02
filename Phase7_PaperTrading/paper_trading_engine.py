@@ -60,6 +60,9 @@ class PaperTradingEngine:
         logger.info(f"🛡️  Stop Loss: {config.STOP_LOSS_PERCENT}%")
         logger.info(f"🎯 Take Profit: {config.TAKE_PROFIT_PERCENT}")
         logger.info(f"💵 Minimum confidence: {config.MIN_CONFIDENCE_TO_TRADE}%")
+        logger.info("======================================================================")
+        logger.info("📋 Fiyat verisi olan coinler için işlem yapılacak")
+        logger.info("⚠️  Yeni coinler collectors restart sonrası eklenecek")
         logger.info("======================================================================\n")
 
     def get_current_price(self, symbol: str, exchange: str = "gate.io") -> Optional[float]:
@@ -98,8 +101,37 @@ class PaperTradingEngine:
             logger.error(f"❌ Fiyat alınırken hata: {e}")
             return None
 
+    def check_price_data_available(self, symbol: str, exchange: str = "gate.io") -> bool:
+        """Sembol için fiyat verisi mevcut mu kontrol et"""
+        try:
+            # Symbol formatını düzenle
+            if exchange == "gate.io" and "_" not in symbol:
+                symbol = symbol.replace("USDT", "_USDT")
+            elif exchange == "binance" and "_" in symbol:
+                symbol = symbol.replace("_", "")
+
+            conn = sqlite3.connect(str(self.klines_db))
+            cursor = conn.cursor()
+
+            # Son 10 dakika içinde veri var mı kontrol et
+            ten_mins_ago = (datetime.now() - timedelta(minutes=10)).isoformat()
+
+            cursor.execute("""
+                SELECT COUNT(*) FROM klines
+                WHERE symbol = ? AND exchange = ? AND datetime >= ?
+            """, (symbol, exchange, ten_mins_ago))
+
+            result = cursor.fetchone()
+            conn.close()
+
+            return result and result[0] > 0
+
+        except Exception as e:
+            logger.error(f"❌ Veri kontrolü hatası ({symbol}): {e}")
+            return False
+
     def load_recent_alerts(self) -> List[dict]:
-        """Son pump alert'lerini oku"""
+        """Son pump alert'lerini oku ve fiyat verisi olmayanları filtrele"""
         alerts = []
 
         try:
@@ -127,7 +159,28 @@ class PaperTradingEngine:
                 if alert_time >= ten_mins_ago:
                     recent_alerts.append(alert)
 
-            return recent_alerts
+            # Fiyat verisi olmayan coinleri filtrele
+            valid_alerts = []
+            skipped_coins = []
+
+            for alert in recent_alerts:
+                symbol = alert['symbol']
+                exchange = alert.get('exchange', 'gate.io')
+
+                if self.check_price_data_available(symbol, exchange):
+                    valid_alerts.append(alert)
+                else:
+                    skipped_coins.append(symbol)
+
+            # Atlanan coinleri logla (tekrarlı mesajları önlemek için sadece benzersizleri)
+            if skipped_coins:
+                unique_skipped = list(set(skipped_coins))
+                if len(unique_skipped) <= 5:
+                    logger.debug(f"⏭️  Fiyat verisi yok (atlandı): {', '.join(unique_skipped)}")
+                else:
+                    logger.debug(f"⏭️  {len(unique_skipped)} coin için fiyat verisi yok (atlandı)")
+
+            return valid_alerts
 
         except Exception as e:
             logger.error(f"❌ Alert'ler okunurken hata: {e}")
@@ -164,6 +217,12 @@ class PaperTradingEngine:
         """Yeni alert'leri işle ve pozisyon aç"""
         alerts = self.load_recent_alerts()
 
+        if not alerts:
+            logger.debug("📭 İşlenecek yeni alert yok")
+            return
+
+        logger.info(f"📬 {len(alerts)} yeni alert bulundu (fiyat verisi mevcut olanlar)")
+
         for alert in alerts:
             if not self.should_open_position(alert):
                 continue
@@ -180,6 +239,9 @@ class PaperTradingEngine:
             if volume_change == float('inf') or volume_change == '∞':
                 volume_change = 10000.0
 
+            logger.info(f"🎯 {alert['symbol']} için pozisyon açılıyor...")
+            logger.info(f"   └── Confidence: {alert['confidence']:.1f}%, Volume: {volume_change:.0f}%, Price: ${current_price:.4f}")
+
             position = self.position_manager.open_position(
                 symbol=alert['symbol'],
                 entry_price=current_price,
@@ -188,6 +250,7 @@ class PaperTradingEngine:
             )
 
             if position:
+                logger.info(f"✅ Pozisyon açıldı: {alert['symbol']}")
                 # Alert'i işlenmiş olarak işaretle
                 alert_id = f"{alert['symbol']}_{alert['timestamp']}"
                 self.processed_alerts.add(alert_id)
@@ -196,6 +259,8 @@ class PaperTradingEngine:
                 if len(self.processed_alerts) > 1000:
                     # En eskilerini sil
                     self.processed_alerts = set(list(self.processed_alerts)[-500:])
+            else:
+                logger.warning(f"⚠️  {alert['symbol']} için pozisyon açılamadı")
 
     def update_open_positions(self):
         """Açık pozisyonları güncelle ve exit koşullarını kontrol et"""
