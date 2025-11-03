@@ -42,7 +42,7 @@ conn = sqlite3.connect(str(db_file))
 cursor = conn.cursor()
 
 # Son 30 dakika içinde veri toplanan coinleri listele
-thirty_mins_ago = (datetime.now() - timedelta(minutes=30)).isoformat()
+thirty_mins_ago = (datetime.now() - timedelta(minutes=30)).strftime("%Y-%m-%d %H:%M:%S")
 
 cursor.execute("""
     SELECT
