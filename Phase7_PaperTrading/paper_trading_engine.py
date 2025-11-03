@@ -80,7 +80,7 @@ class PaperTradingEngine:
             cursor = conn.cursor()
 
             # Son 5 dakika içindeki en son kapanış fiyatını al
-            five_mins_ago = (datetime.now() - timedelta(minutes=5)).isoformat()
+            five_mins_ago = (datetime.now() - timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
 
             cursor.execute("""
                 SELECT close FROM klines
@@ -114,7 +114,7 @@ class PaperTradingEngine:
             cursor = conn.cursor()
 
             # Son 10 dakika içinde veri var mı kontrol et
-            ten_mins_ago = (datetime.now() - timedelta(minutes=10)).isoformat()
+            ten_mins_ago = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
 
             cursor.execute("""
                 SELECT COUNT(*) FROM klines

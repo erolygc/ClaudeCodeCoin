@@ -9,7 +9,7 @@ INITIAL_BALANCE = 10000.0  # USD
 # Risk Yönetimi
 MAX_POSITION_SIZE_PERCENT = 10.0  # Portföyün maksimum %10'u tek işlemde
 MIN_POSITION_SIZE = 50.0  # Minimum işlem büyüklüğü (USD)
-MAX_OPEN_POSITIONS = 5  # Aynı anda açık olabilecek maksimum pozisyon sayısı
+MAX_OPEN_POSITIONS = 10  # Aynı anda açık olabilecek maksimum pozisyon sayısı (TEST: 10, PROD: 5)
 
 # Stop Loss & Take Profit
 STOP_LOSS_PERCENT = 5.0  # %5 zarar durdur
@@ -20,9 +20,9 @@ TAKE_PROFIT_PERCENT = {
     'LOW': 10.0        # 30-50% confidence için %10 kar al
 }
 
-# Pozisyon Açma Kriterleri
-MIN_CONFIDENCE_TO_TRADE = 50.0  # Minimum %50 confidence gerekli
-MIN_VOLUME_SPIKE = 500.0  # Minimum %500 hacim artışı (5x)
+# Pozisyon Açma Kriterleri (TEST MODE - Gevşek filtreler)
+MIN_CONFIDENCE_TO_TRADE = 10.0  # TEST: %10 (PROD: %50) - Neredeyse tüm sinyaller
+MIN_VOLUME_SPIKE = 50.0  # TEST: %50 (PROD: %500) - Düşük hacim artışları bile kabul
 
 # Pozisyon Boyutlandırma (Confidence'a göre)
 POSITION_SIZE_MULTIPLIER = {
