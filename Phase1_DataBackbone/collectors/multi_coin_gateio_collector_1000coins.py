@@ -220,7 +220,7 @@ class GateIOCollector:
             self.initialize_db()
 
             logger.info("="*80)
-            logger.info("🚀 GATE.IO COLLECTOR STARTED (1000 COIN SYSTEM)")
+            logger.info("GATE.IO COLLECTOR STARTED (1000 COIN SYSTEM)")
             logger.info("="*80)
             logger.info(f"Monitoring: {len(self.symbols)} coins")
             logger.info(f"Top 5: {self.symbols[:5]}")
@@ -261,7 +261,7 @@ async def main():
 if __name__ == "__main__":
     print()
     print("="*80)
-    print("🔶 GATE.IO COLLECTOR - 1000 COIN SYSTEM")
+    print("GATE.IO COLLECTOR - 1000 COIN SYSTEM")
     print("="*80)
     print()
     print("Starting collector...")

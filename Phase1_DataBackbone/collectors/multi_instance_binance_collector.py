@@ -120,6 +120,14 @@ class BinanceMultiCollector:
     async def process_message(self, msg):
         """Process incoming kline message"""
         try:
+            # Check if msg is a dict
+            if not isinstance(msg, dict):
+                return
+
+            # Skip if no event type
+            if 'e' not in msg:
+                return
+
             if msg['e'] == 'error':
                 self.logger.error(f"WebSocket error: {msg}")
                 return
@@ -129,10 +137,12 @@ class BinanceMultiCollector:
 
             self.message_count += 1
 
-            kline = msg['k']
+            kline = msg.get('k')
+            if not kline:
+                return
 
             # Only save closed candles
-            if not kline['x']:
+            if not kline.get('x'):
                 return
 
             symbol = kline['s']
@@ -204,7 +214,7 @@ class BinanceMultiCollector:
             await self.initialize()
 
             self.logger.info("="*80)
-            self.logger.info(f"🚀 BINANCE COLLECTOR INSTANCE {self.instance_id} STARTED")
+            self.logger.info(f"BINANCE COLLECTOR INSTANCE {self.instance_id} STARTED")
             self.logger.info("="*80)
             self.logger.info(f"Monitoring: {len(self.symbols)} coins")
             self.logger.info(f"Top 5: {self.symbols[:5]}")
@@ -246,13 +256,13 @@ async def main():
     config = get_binance_instance_config(instance_id)
 
     if not config:
-        print(f"❌ No configuration found for instance {instance_id}")
+        print(f"ERROR: No configuration found for instance {instance_id}")
         return
 
     symbols = config['symbols']
 
     if len(symbols) == 0:
-        print(f"⚠️  Instance {instance_id} has no symbols assigned")
+        print(f"WARNING: Instance {instance_id} has no symbols assigned")
         return
 
     # Setup logger
@@ -265,7 +275,7 @@ async def main():
 if __name__ == "__main__":
     print()
     print("="*80)
-    print("🔷 BINANCE MULTI-INSTANCE COLLECTOR")
+    print("BINANCE MULTI-INSTANCE COLLECTOR")
     print("="*80)
     print()
     print("Starting collector...")
