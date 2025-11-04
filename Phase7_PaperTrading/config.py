@@ -9,20 +9,20 @@ INITIAL_BALANCE = 10000.0  # USD
 # Risk Yönetimi
 MAX_POSITION_SIZE_PERCENT = 10.0  # Portföyün maksimum %10'u tek işlemde
 MIN_POSITION_SIZE = 50.0  # Minimum işlem büyüklüğü (USD)
-MAX_OPEN_POSITIONS = 10  # Aynı anda açık olabilecek maksimum pozisyon sayısı (TEST: 10, PROD: 5)
+MAX_OPEN_POSITIONS = 15  # Aynı anda açık olabilecek maksimum pozisyon sayısı (1000 coin için)
 
 # Stop Loss & Take Profit
 STOP_LOSS_PERCENT = 5.0  # %5 zarar durdur
 TAKE_PROFIT_PERCENT = {
-    'CRITICAL': 20.0,  # 85%+ confidence için %20 kar al
-    'HIGH': 15.0,      # 70-85% confidence için %15 kar al
-    'MEDIUM': 12.0,    # 50-70% confidence için %12 kar al
+    'CRITICAL': 25.0,  # 85%+ confidence için %25 kar al (güçlü pump'lar)
+    'HIGH': 20.0,      # 70-85% confidence için %20 kar al
+    'MEDIUM': 15.0,    # 50-70% confidence için %15 kar al
     'LOW': 10.0        # 30-50% confidence için %10 kar al
 }
 
-# Pozisyon Açma Kriterleri (TEST MODE - Gevşek filtreler)
-MIN_CONFIDENCE_TO_TRADE = 10.0  # TEST: %10 (PROD: %50) - Neredeyse tüm sinyaller
-MIN_VOLUME_SPIKE = 50.0  # TEST: %50 (PROD: %500) - Düşük hacim artışları bile kabul
+# Pozisyon Açma Kriterleri - PRODUCTION MODE (Yüksek Kalite)
+MIN_CONFIDENCE_TO_TRADE = 70.0  # PRODUCTION: %70 - Sadece güçlü sinyaller (1000 coin için)
+MIN_VOLUME_SPIKE = 800.0  # PRODUCTION: %800 - Gerçek pump'lar (yüksek doğruluk)
 
 # Pozisyon Boyutlandırma (Confidence'a göre)
 POSITION_SIZE_MULTIPLIER = {
@@ -33,7 +33,7 @@ POSITION_SIZE_MULTIPLIER = {
 }
 
 # Pozisyon Kapatma Kriterleri
-AUTO_CLOSE_AFTER_MINUTES = 30  # 30 dakika sonra otomatik kapat
+AUTO_CLOSE_AFTER_MINUTES = 45  # 45 dakika sonra otomatik kapat (trend takibi için)
 TRAILING_STOP_PERCENT = 3.0  # Trailing stop: En yüksek değerden %3 düşerse kapat
 
 # İşlem Ücretleri (Gerçekçi simulasyon için)
