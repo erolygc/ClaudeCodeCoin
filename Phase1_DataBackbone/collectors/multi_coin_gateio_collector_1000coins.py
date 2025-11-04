@@ -199,7 +199,7 @@ class GateIOCollector:
             await self.subscribe_to_symbols(websocket)
 
             logger.info("="*80)
-            logger.info("🟢 GATE.IO COLLECTOR ACTIVE - Monitoring 550 coins")
+            logger.info("[ACTIVE] GATE.IO COLLECTOR - Monitoring 550 coins")
             logger.info("="*80)
 
             # Receive messages
