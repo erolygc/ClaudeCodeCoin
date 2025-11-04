@@ -53,16 +53,16 @@ class PaperTradingEngine:
         self.processed_alerts = set()
 
         logger.info("======================================================================")
-        logger.info("🚀 ClaudeCodeCoin - Paper Trading Engine")
+        logger.info("[START] ClaudeCodeCoin - Paper Trading Engine")
         logger.info("======================================================================")
-        logger.info(f"💰 Başlangıç bakiyesi: ${config.INITIAL_BALANCE:.2f}")
-        logger.info(f"📊 Maksimum pozisyon: {config.MAX_OPEN_POSITIONS}")
-        logger.info(f"🛡️  Stop Loss: {config.STOP_LOSS_PERCENT}%")
-        logger.info(f"🎯 Take Profit: {config.TAKE_PROFIT_PERCENT}")
-        logger.info(f"💵 Minimum confidence: {config.MIN_CONFIDENCE_TO_TRADE}%")
+        logger.info(f"[BALANCE] Baslangic bakiyesi: ${config.INITIAL_BALANCE:.2f}")
+        logger.info(f"[CONFIG] Maksimum pozisyon: {config.MAX_OPEN_POSITIONS}")
+        logger.info(f"[CONFIG] Stop Loss: {config.STOP_LOSS_PERCENT}%")
+        logger.info(f"[CONFIG] Take Profit: {config.TAKE_PROFIT_PERCENT}")
+        logger.info(f"[CONFIG] Minimum confidence: {config.MIN_CONFIDENCE_TO_TRADE}%")
         logger.info("======================================================================")
-        logger.info("📋 Fiyat verisi olan coinler için işlem yapılacak")
-        logger.info("⚠️  Yeni coinler collectors restart sonrası eklenecek")
+        logger.info("[INFO] Fiyat verisi olan coinler icin islem yapilacak")
+        logger.info("[WARN] Yeni coinler collectors restart sonrasi eklenecek")
         logger.info("======================================================================\n")
 
     def get_current_price(self, symbol: str, exchange: str = "gate.io") -> Optional[float]:
@@ -94,11 +94,11 @@ class PaperTradingEngine:
             if result:
                 return float(result[0])
             else:
-                logger.warning(f"⚠️  {symbol} için güncel fiyat bulunamadı")
+                logger.warning(f"[WARN] {symbol} icin guncel fiyat bulunamadi")
                 return None
 
         except Exception as e:
-            logger.error(f"❌ Fiyat alınırken hata: {e}")
+            logger.error(f"[ERROR] Fiyat alinirken hata: {e}")
             return None
 
     def check_price_data_available(self, symbol: str, exchange: str = "gate.io") -> bool:
@@ -127,7 +127,7 @@ class PaperTradingEngine:
             return result and result[0] > 0
 
         except Exception as e:
-            logger.error(f"❌ Veri kontrolü hatası ({symbol}): {e}")
+            logger.error(f"[ERROR] Veri kontrolu hatasi ({symbol}): {e}")
             return False
 
     def load_recent_alerts(self) -> List[dict]:
@@ -140,7 +140,7 @@ class PaperTradingEngine:
             alert_file = self.alerts_file / f"pump_alerts_{today}.json"
 
             if not alert_file.exists():
-                logger.info(f"ℹ️  Alert dosyası bulunamadı: {alert_file}")
+                logger.info(f"[INFO] Alert dosyasi bulunamadi: {alert_file}")
                 return alerts
 
             with open(alert_file, 'r', encoding='utf-8') as f:
@@ -151,7 +151,7 @@ class PaperTradingEngine:
                 else:
                     alerts = data.get('alerts', [])
 
-            logger.info(f"📄 Alert dosyasından {len(alerts)} toplam alert okundu")
+            logger.info(f"[FILE] Alert dosyasindan {len(alerts)} toplam alert okundu")
 
             # Sadece son 10 dakika içindeki alert'leri al
             recent_alerts = []
@@ -162,7 +162,7 @@ class PaperTradingEngine:
                 if alert_time >= ten_mins_ago:
                     recent_alerts.append(alert)
 
-            logger.info(f"⏰ Son 10 dakikada {len(recent_alerts)} alert var")
+            logger.info(f"[TIME] Son 10 dakikada {len(recent_alerts)} alert var")
 
             # Fiyat verisi olmayan coinleri filtrele
             valid_alerts = []
@@ -183,24 +183,24 @@ class PaperTradingEngine:
 
             # İşlenecek coinleri göster
             if valid_coins:
-                logger.info(f"✅ Fiyat verisi VAR ({len(valid_coins)} alert):")
+                logger.info(f"[OK] Fiyat verisi VAR ({len(valid_coins)} alert):")
                 for coin_info in valid_coins[:5]:  # İlk 5'ini göster
-                    logger.info(f"   └── {coin_info}")
+                    logger.info(f"   |-- {coin_info}")
                 if len(valid_coins) > 5:
-                    logger.info(f"   └── ... ve {len(valid_coins) - 5} tane daha")
+                    logger.info(f"   |-- ... ve {len(valid_coins) - 5} tane daha")
 
             # Atlanan coinleri logla
             if skipped_coins:
                 unique_skipped = list(set(skipped_coins))
                 if len(unique_skipped) <= 5:
-                    logger.info(f"⏭️  Fiyat verisi YOK (atlandı): {', '.join(unique_skipped)}")
+                    logger.info(f"[SKIP] Fiyat verisi YOK (atlandi): {', '.join(unique_skipped)}")
                 else:
-                    logger.info(f"⏭️  {len(unique_skipped)} coin için fiyat verisi YOK (atlandı)")
+                    logger.info(f"[SKIP] {len(unique_skipped)} coin icin fiyat verisi YOK (atlandi)")
 
             return valid_alerts
 
         except Exception as e:
-            logger.error(f"❌ Alert'ler okunurken hata: {e}")
+            logger.error(f"[ERROR] Alert'ler okunurken hata: {e}")
             return []
 
     def should_open_position(self, alert: dict) -> bool:
@@ -209,7 +209,7 @@ class PaperTradingEngine:
 
         # Minimum confidence kontrolü
         if alert['confidence'] < config.MIN_CONFIDENCE_TO_TRADE:
-            logger.info(f"   ⊘ {symbol}: Confidence çok düşük ({alert['confidence']:.1f}% < {config.MIN_CONFIDENCE_TO_TRADE}%)")
+            logger.info(f"   [X] {symbol}: Confidence cok dusuk ({alert['confidence']:.1f}% < {config.MIN_CONFIDENCE_TO_TRADE}%)")
             return False
 
         # Minimum hacim spike kontrolü (volume_change_pct yüzde olarak geliyor)
@@ -219,18 +219,18 @@ class PaperTradingEngine:
             volume_change = 10000.0  # Çok yüksek hacim artışı olarak kabul et
 
         if volume_change < config.MIN_VOLUME_SPIKE:
-            logger.info(f"   ⊘ {symbol}: Volume spike çok düşük ({volume_change:.0f}% < {config.MIN_VOLUME_SPIKE}%)")
+            logger.info(f"   [X] {symbol}: Volume spike cok dusuk ({volume_change:.0f}% < {config.MIN_VOLUME_SPIKE}%)")
             return False
 
         # Bu alert daha önce işlendi mi?
         alert_id = f"{alert['symbol']}_{alert['timestamp']}"
         if alert_id in self.processed_alerts:
-            logger.info(f"   ⊘ {symbol}: Bu alert daha önce işlendi")
+            logger.info(f"   [X] {symbol}: Bu alert daha once islendi")
             return False
 
         # Zaten bu sembolde açık pozisyon var mı?
         if alert['symbol'] in self.position_manager.open_positions:
-            logger.info(f"   ⊘ {symbol}: Bu coin için zaten açık pozisyon var")
+            logger.info(f"   [X] {symbol}: Bu coin icin zaten acik pozisyon var")
             return False
 
         return True
@@ -240,10 +240,10 @@ class PaperTradingEngine:
         alerts = self.load_recent_alerts()
 
         if not alerts:
-            logger.info("📭 İşlenecek yeni alert yok (fiyat verisi veya zaman filtresi)")
+            logger.info("[EMPTY] Islenecek yeni alert yok (fiyat verisi veya zaman filtresi)")
             return
 
-        logger.info(f"📬 {len(alerts)} yeni alert bulundu (fiyat verisi mevcut olanlar)")
+        logger.info(f"[ALERT] {len(alerts)} yeni alert bulundu (fiyat verisi mevcut olanlar)")
 
         for alert in alerts:
             if not self.should_open_position(alert):
@@ -261,8 +261,8 @@ class PaperTradingEngine:
             if volume_change == float('inf') or volume_change == '∞':
                 volume_change = 10000.0
 
-            logger.info(f"🎯 {alert['symbol']} için pozisyon açılıyor...")
-            logger.info(f"   └── Confidence: {alert['confidence']:.1f}%, Volume: {volume_change:.0f}%, Price: ${current_price:.4f}")
+            logger.info(f"[OPEN] {alert['symbol']} icin pozisyon aciliyor...")
+            logger.info(f"   |-- Confidence: {alert['confidence']:.1f}%, Volume: {volume_change:.0f}%, Price: ${current_price:.4f}")
 
             position = self.position_manager.open_position(
                 symbol=alert['symbol'],
@@ -272,7 +272,7 @@ class PaperTradingEngine:
             )
 
             if position:
-                logger.info(f"✅ Pozisyon açıldı: {alert['symbol']}")
+                logger.info(f"[OK] Pozisyon acildi: {alert['symbol']}")
                 # Alert'i işlenmiş olarak işaretle
                 alert_id = f"{alert['symbol']}_{alert['timestamp']}"
                 self.processed_alerts.add(alert_id)
@@ -282,7 +282,7 @@ class PaperTradingEngine:
                     # En eskilerini sil
                     self.processed_alerts = set(list(self.processed_alerts)[-500:])
             else:
-                logger.warning(f"⚠️  {alert['symbol']} için pozisyon açılamadı")
+                logger.warning(f"[WARN] {alert['symbol']} icin pozisyon acilamadi")
 
     def update_open_positions(self):
         """Açık pozisyonları güncelle ve exit koşullarını kontrol et"""
@@ -305,24 +305,24 @@ class PaperTradingEngine:
         summary = self.position_manager.get_portfolio_summary()
 
         logger.info("\n" + "="*70)
-        logger.info("📊 PORTFÖY DURUMU")
+        logger.info("[STATUS] PORTFOY DURUMU")
         logger.info("="*70)
-        logger.info(f"💰 Bakiye: ${summary['balance']:.2f}")
-        logger.info(f"📈 Toplam P&L: ${summary['total_pnl']:.2f} ({summary['total_pnl_percent']:+.2f}%)")
-        logger.info(f"📊 Açık Pozisyon: {summary['open_positions']}")
-        logger.info(f"✅ Toplam İşlem: {summary['total_trades']}")
+        logger.info(f"[BALANCE] Bakiye: ${summary['balance']:.2f}")
+        logger.info(f"[PNL] Toplam P&L: ${summary['total_pnl']:.2f} ({summary['total_pnl_percent']:+.2f}%)")
+        logger.info(f"[POS] Acik Pozisyon: {summary['open_positions']}")
+        logger.info(f"[TRADES] Toplam Islem: {summary['total_trades']}")
 
         if summary['total_trades'] > 0:
-            logger.info(f"🎯 Win Rate: {summary['win_rate']:.1f}%")
-            logger.info(f"   └── Kazanan: {summary['winning_trades']}, Kaybeden: {summary['losing_trades']}")
-            logger.info(f"💵 Ortalama Kazanç: ${summary['avg_win']:.2f}")
-            logger.info(f"💸 Ortalama Zarar: ${summary['avg_loss']:.2f}")
+            logger.info(f"[WIN] Win Rate: {summary['win_rate']:.1f}%")
+            logger.info(f"   |-- Kazanan: {summary['winning_trades']}, Kaybeden: {summary['losing_trades']}")
+            logger.info(f"[AVG+] Ortalama Kazanc: ${summary['avg_win']:.2f}")
+            logger.info(f"[AVG-] Ortalama Zarar: ${summary['avg_loss']:.2f}")
 
         logger.info("="*70 + "\n")
 
         # Açık pozisyonları listele
         if self.position_manager.open_positions:
-            logger.info("📍 AÇIK POZİSYONLAR:")
+            logger.info("[POSITIONS] ACIK POZISYONLAR:")
             for symbol, pos in self.position_manager.open_positions.items():
                 current_price = self.get_current_price(symbol, config.DEFAULT_EXCHANGE)
                 if current_price:
@@ -338,14 +338,14 @@ class PaperTradingEngine:
 
     def run(self, interval_seconds: int = 30):
         """Ana döngüyü başlat"""
-        logger.info("🔄 Paper trading başlatıldı...\n")
+        logger.info("[RUN] Paper trading baslatildi...\n")
 
         iteration = 0
 
         try:
             while True:
                 iteration += 1
-                logger.info(f"🔍 İterasyon #{iteration} - {datetime.now().strftime('%H:%M:%S')}")
+                logger.info(f"[ITER] Iterasyon #{iteration} - {datetime.now().strftime('%H:%M:%S')}")
 
                 # 1. Yeni alert'leri kontrol et ve pozisyon aç
                 self.process_alerts()
@@ -361,9 +361,9 @@ class PaperTradingEngine:
                 time.sleep(interval_seconds)
 
         except KeyboardInterrupt:
-            logger.info("\n⛔ Paper trading durduruldu")
+            logger.info("\n[STOP] Paper trading durduruldu")
             self.print_status()
-            logger.info("👋 Görüşmek üzere!")
+            logger.info("[EXIT] Gorusmek uzere!")
 
 
 if __name__ == "__main__":

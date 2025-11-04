@@ -195,8 +195,8 @@ class PositionManager:
             self.balance = last_balance[0]
 
         conn.close()
-        logger.info(f"💰 Başlangıç bakiyesi: ${self.balance:.2f}")
-        logger.info(f"📊 Açık pozisyon: {len(self.open_positions)} adet")
+        logger.info(f"[BALANCE] Baslangic bakiyesi: ${self.balance:.2f}")
+        logger.info(f"[POSITIONS] Acik pozisyon: {len(self.open_positions)} adet")
 
     def can_open_position(self, symbol: str, required_capital: float) -> Tuple[bool, str]:
         """Yeni pozisyon açılabilir mi kontrol et"""
@@ -241,7 +241,12 @@ class PositionManager:
         # Pozisyon açılabilir mi kontrol et
         can_open, reason = self.can_open_position(symbol, position_value)
         if not can_open:
-            logger.warning(f"❌ Pozisyon açılamadı: {reason}")
+            logger.warning(f"[ERROR] Pozisyon acilamadi: {reason}")
+            return None
+
+        # Entry price sıfır kontrolü (ZeroDivisionError önleme)
+        if entry_price <= 0:
+            logger.warning(f"[ERROR] Gecersiz entry price: ${entry_price:.8f} - Pozisyon acilamiyor")
             return None
 
         # Quantity hesapla
@@ -283,7 +288,7 @@ class PositionManager:
         # Açık pozisyonlara ekle
         self.open_positions[symbol] = position
 
-        logger.info(f"✅ YENİ POZİSYON AÇILDI:")
+        logger.info(f"[OPEN] YENI POZISYON ACILDI:")
         logger.info(f"   Symbol: {symbol}")
         logger.info(f"   Entry: ${entry_price:.4f}")
         logger.info(f"   Quantity: {quantity:.4f}")
@@ -298,7 +303,7 @@ class PositionManager:
     def close_position(self, symbol: str, exit_price: float, reason: str) -> Optional[float]:
         """Pozisyonu kapat"""
         if symbol not in self.open_positions:
-            logger.warning(f"❌ {symbol} için açık pozisyon bulunamadı")
+            logger.warning(f"[ERROR] {symbol} icin acik pozisyon bulunamadi")
             return None
 
         position = self.open_positions[symbol]
@@ -333,13 +338,13 @@ class PositionManager:
         pnl_percent = (pnl / (position.entry_price * position.quantity)) * 100
         duration = (position.exit_time - position.entry_time).total_seconds() / 60
 
-        logger.info(f"🔴 POZİSYON KAPANDI:")
+        logger.info(f"[CLOSE] POZISYON KAPANDI:")
         logger.info(f"   Symbol: {symbol}")
         logger.info(f"   Entry: ${position.entry_price:.4f}")
         logger.info(f"   Exit: ${exit_price:.4f}")
         logger.info(f"   P&L: ${pnl:.2f} ({pnl_percent:+.2f}%)")
         logger.info(f"   Sebep: {reason}")
-        logger.info(f"   Süre: {duration:.1f} dakika")
+        logger.info(f"   Sure: {duration:.1f} dakika")
         logger.info(f"   Yeni bakiye: ${self.balance:.2f}")
 
         return pnl
