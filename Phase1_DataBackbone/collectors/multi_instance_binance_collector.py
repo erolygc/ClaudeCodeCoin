@@ -64,22 +64,19 @@ def init_database():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS klines (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            symbol TEXT NOT NULL,
-            exchange TEXT NOT NULL,
-            interval TEXT NOT NULL,
-            open_time INTEGER NOT NULL,
+            timestamp INTEGER NOT NULL,
             datetime TEXT NOT NULL,
+            symbol TEXT NOT NULL,
+            interval TEXT NOT NULL,
             open REAL NOT NULL,
             high REAL NOT NULL,
             low REAL NOT NULL,
             close REAL NOT NULL,
             volume REAL NOT NULL,
-            close_time INTEGER,
-            quote_volume REAL,
-            trades INTEGER,
-            taker_buy_base REAL,
-            taker_buy_quote REAL,
-            UNIQUE(symbol, exchange, open_time)
+            number_of_trades INTEGER DEFAULT 0,
+            collected_at TEXT NOT NULL,
+            exchange TEXT DEFAULT 'binance',
+            UNIQUE(timestamp, symbol, exchange)
         )
     """)
 
@@ -143,30 +140,31 @@ class BinanceMultiCollector:
             # Parse data
             open_time = kline['t']
             datetime_str = datetime.fromtimestamp(open_time / 1000).strftime("%Y-%m-%d %H:%M:%S")
+            collected_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            # Insert into database
+            # Convert timestamp to seconds (database uses seconds, not milliseconds)
+            timestamp_seconds = int(open_time / 1000)
+
+            # Insert into database using OLD schema
             cursor = self.conn.cursor()
             cursor.execute("""
                 INSERT OR REPLACE INTO klines
-                (symbol, exchange, interval, open_time, datetime, open, high, low, close, volume,
-                 close_time, quote_volume, trades, taker_buy_base, taker_buy_quote)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (timestamp, datetime, symbol, interval, open, high, low, close, volume,
+                 number_of_trades, collected_at, exchange)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                symbol,
-                "binance",
-                "1m",
-                open_time,
+                timestamp_seconds,
                 datetime_str,
+                symbol,
+                "1m",
                 float(kline['o']),
                 float(kline['h']),
                 float(kline['l']),
                 float(kline['c']),
                 float(kline['v']),
-                kline['T'],
-                float(kline['q']),
-                kline['n'],
-                float(kline['V']),
-                float(kline['Q'])
+                kline['n'],  # number of trades
+                collected_at,
+                "binance"
             ))
 
             self.conn.commit()

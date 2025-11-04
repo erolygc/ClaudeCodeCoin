@@ -48,22 +48,19 @@ def init_database():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS klines (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            symbol TEXT NOT NULL,
-            exchange TEXT NOT NULL,
-            interval TEXT NOT NULL,
-            open_time INTEGER NOT NULL,
+            timestamp INTEGER NOT NULL,
             datetime TEXT NOT NULL,
+            symbol TEXT NOT NULL,
+            interval TEXT NOT NULL,
             open REAL NOT NULL,
             high REAL NOT NULL,
             low REAL NOT NULL,
             close REAL NOT NULL,
             volume REAL NOT NULL,
-            close_time INTEGER,
-            quote_volume REAL,
-            trades INTEGER,
-            taker_buy_base REAL,
-            taker_buy_quote REAL,
-            UNIQUE(symbol, exchange, open_time)
+            number_of_trades INTEGER DEFAULT 0,
+            collected_at TEXT NOT NULL,
+            exchange TEXT DEFAULT 'gate.io',
+            UNIQUE(timestamp, symbol, exchange)
         )
     """)
 
@@ -108,44 +105,55 @@ class GateIOCollector:
                 timestamp = result['t']
                 symbol = result['n'].replace('spot.candlesticks.1m.', '')
 
-                # Only save closed candles
-                # Gate.io sends updates, we need to track closed candles
-                # For simplicity, save every update (Paper Trading will handle duplicates)
+                # Parse OHLCV - Gate.io format: [timestamp_str, volume_str, close_str, high_str, low_str, open_str, ...]
+                ohlcv = result.get('c', [])
+
+                if len(ohlcv) < 6:
+                    return  # Skip incomplete data
+
+                # Helper function to safely convert to float
+                def safe_float(value, default=0.0):
+                    try:
+                        if value == '.' or value == '' or value is None:
+                            return default
+                        return float(value)
+                    except (ValueError, TypeError):
+                        return default
+
+                # Parse values with safety checks
+                open_price = safe_float(ohlcv[5])
+                high_price = safe_float(ohlcv[3])
+                low_price = safe_float(ohlcv[4])
+                close_price = safe_float(ohlcv[2])
+                volume = safe_float(ohlcv[1])
+
+                # Skip if all prices are 0
+                if open_price == 0 and high_price == 0 and low_price == 0 and close_price == 0:
+                    return
 
                 datetime_str = datetime.fromtimestamp(int(timestamp)).strftime("%Y-%m-%d %H:%M:%S")
+                collected_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-                # Parse OHLCV
-                ohlcv = result['c']  # [timestamp, volume, close, high, low, open, ...]
-
-                open_price = float(ohlcv[5]) if len(ohlcv) > 5 else 0
-                high_price = float(ohlcv[3]) if len(ohlcv) > 3 else 0
-                low_price = float(ohlcv[4]) if len(ohlcv) > 4 else 0
-                close_price = float(ohlcv[2]) if len(ohlcv) > 2 else 0
-                volume = float(ohlcv[1]) if len(ohlcv) > 1 else 0
-
-                # Insert into database
+                # Insert into database using OLD schema
                 cursor = self.conn.cursor()
                 cursor.execute("""
                     INSERT OR REPLACE INTO klines
-                    (symbol, exchange, interval, open_time, datetime, open, high, low, close, volume,
-                     close_time, quote_volume, trades, taker_buy_base, taker_buy_quote)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    (timestamp, datetime, symbol, interval, open, high, low, close, volume,
+                     number_of_trades, collected_at, exchange)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                    symbol,
-                    "gate.io",
-                    "1m",
-                    int(timestamp) * 1000,  # Convert to milliseconds
+                    int(timestamp),
                     datetime_str,
+                    symbol,
+                    "1m",
                     open_price,
                     high_price,
                     low_price,
                     close_price,
                     volume,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None
+                    0,  # number_of_trades
+                    collected_at,
+                    "gate.io"
                 ))
 
                 self.conn.commit()
