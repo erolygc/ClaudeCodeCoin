@@ -210,20 +210,25 @@ class PumpDetectionEngine:
 
         # Hacim değişimleri
         df['volume_change'] = df['volume'].pct_change() * 100
-        df['volume_ma_20'] = df['volume'].rolling(window=20).mean()
+        # Use min_periods=1 to calculate from first bar, avoiding NaN
+        df['volume_ma_20'] = df['volume'].rolling(window=20, min_periods=5).mean()
         df['volume_ratio'] = df['volume'] / df['volume_ma_20']
+        # Fill any remaining NaN with 1.0 (neutral ratio)
+        df['volume_ratio'].fillna(1.0, inplace=True)
 
         # Volatilite (ATR)
         df['high_low'] = df['high'] - df['low']
         df['high_close'] = abs(df['high'] - df['close'].shift())
         df['low_close'] = abs(df['low'] - df['close'].shift())
         df['tr'] = df[['high_low', 'high_close', 'low_close']].max(axis=1)
-        df['atr'] = df['tr'].rolling(window=14).mean()
+        df['atr'] = df['tr'].rolling(window=14, min_periods=5).mean()
         df['atr_pct'] = (df['atr'] / df['close']) * 100
 
-        # Volatilite ratio
-        df['atr_ma'] = df['atr'].rolling(window=20).mean()
+        # Volatilite ratio - use min_periods to avoid NaN
+        df['atr_ma'] = df['atr'].rolling(window=20, min_periods=5).mean()
         df['volatility_ratio'] = df['atr'] / df['atr_ma']
+        # Fill any remaining NaN with 1.0 (neutral ratio)
+        df['volatility_ratio'].fillna(1.0, inplace=True)
 
         # Momentum
         df['rsi'] = self._calculate_rsi(df['close'], 14)

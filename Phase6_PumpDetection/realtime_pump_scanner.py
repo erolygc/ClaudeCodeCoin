@@ -34,8 +34,8 @@ class RealtimePumpScanner:
     - JSON dosyasına kaydeder
     """
 
-    def __init__(self, db_path: str = "data_output/binance_data.db",
-                 output_dir: str = "pump_alerts"):
+    def __init__(self, db_path: str = "../data_output/binance_data.db",
+                 output_dir: str = "../pump_alerts"):
         self.engine = PumpDetectionEngine(db_path)
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
