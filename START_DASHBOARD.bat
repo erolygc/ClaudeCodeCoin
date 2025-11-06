@@ -1,31 +1,48 @@
 @echo off
-echo ======================================================================
-echo 📊 ClaudeCodeCoin - Monitoring Dashboard
-echo ======================================================================
+REM ClaudeCodeCoin - Dashboard Launcher (Windows)
+
+echo ================================================================================
+echo                    CLAUDECODECOIN - TRADING DASHBOARD
+echo ================================================================================
 echo.
-echo Dashboard aciliyor...
+echo Professional trading dashboard baslatiliyor...
 echo.
-echo Browser'inizda otomatik olarak acilacak:
-echo http://localhost:8501
+echo Dashboard ozellikleri:
+echo   - Gercek zamanli fiyat grafikleri (Candlestick)
+echo   - Acik pozisyonlar tablosu
+echo   - P^&L grafikleri
+echo   - Portfolio ozeti
+echo   - Son pump alertleri
 echo.
-echo ======================================================================
-echo.
-echo KULLANIM:
-echo   - Dashboard her 10 saniyede otomatik yenilenecek
-echo   - Soldan ayarlari degistirebilirsiniz
-echo   - Grafikleri yakınlastirip uzaklastirabilirsiniz
-echo.
-echo DURDURMAK ICIN: Ctrl+C veya bu pencereyi kapatin
-echo.
-echo ======================================================================
+echo ================================================================================
 echo.
 
-REM Gerekli paketleri kontrol et ve kur
-echo Gerekli paketler kontrol ediliyor...
-pip install streamlit plotly psutil > nul 2>&1
+REM Python kontrolu
+python --version >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] Python bulunamadi!
+    pause
+    exit /b 1
+)
+
+REM Streamlit kontrolu ve yukle
+echo [CHECK] Streamlit kontrol ediliyor...
+python -c "import streamlit" >nul 2>&1
+if errorlevel 1 (
+    echo [INSTALL] Streamlit yukleniyor...
+    pip install streamlit plotly
+)
 
 echo.
-echo Dashboard baslatiliyor...
+echo [START] Dashboard baslatiliyor...
+echo [INFO] Tarayiciniz otomatik acilacak
+echo [INFO] URL: http://localhost:8501
+echo.
+echo [STOP] Durdurmak icin: Ctrl+C
+echo ================================================================================
 echo.
 
-streamlit run Dashboard/monitoring_dashboard.py
+REM Dashboard'u baslat
+streamlit run dashboard.py
+
+pause
