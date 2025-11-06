@@ -262,13 +262,18 @@ class PumpDetectionEngine:
         # Hacim spike varsa
         if volume_ratio >= self.params['volume_spike_threshold']:
             # Confidence hesapla
-            confidence = min(100, 30 + (volume_ratio - 3) * 10)
+            confidence = 30 + (volume_ratio - 3) * 10
 
             # Fiyat değişimi de kontrole ekle
             price_change = latest.get('price_change_5', 0)
+            if pd.isna(price_change):
+                price_change = 0
 
             if price_change > 5:  # Hacim + Fiyat artışı = güçlü sinyal
                 confidence += 15
+
+            # Confidence'i 0-100 arasında tut
+            confidence = max(0, min(100, confidence))
 
             # Seviye belirle
             if confidence >= self.params['critical_confidence']:
@@ -280,6 +285,11 @@ class PumpDetectionEngine:
             else:
                 level = PumpLevel.LOW
 
+            # NaN değerleri handle et
+            volume_change = latest.get('volume_change', 0)
+            if pd.isna(volume_change):
+                volume_change = 0
+
             signal = PumpSignal(
                 symbol=symbol,
                 exchange=exchange,
@@ -288,7 +298,7 @@ class PumpDetectionEngine:
                 level=level,
                 confidence=confidence,
                 price_change_pct=price_change,
-                volume_change_pct=latest.get('volume_change', 0),
+                volume_change_pct=volume_change,
                 time_window_minutes=5,
                 current_price=latest['close'],
                 current_volume=latest['volume'],
@@ -322,17 +332,24 @@ class PumpDetectionEngine:
         # Kısa vadeli surge
         if price_change_5 >= self.params['price_surge_threshold']:
             # Confidence hesapla
-            confidence = min(100, 40 + (price_change_5 - 10) * 2)
+            confidence = 40 + (price_change_5 - 10) * 2
 
             # Hacim de artıyorsa confidence artır
             volume_ratio = latest.get('volume_ratio', 1)
+            if pd.isna(volume_ratio):
+                volume_ratio = 1
             if volume_ratio > 2:
                 confidence += 15
 
             # RSI kontrolü
             rsi = latest.get('rsi', 50)
+            if pd.isna(rsi):
+                rsi = 50
             if rsi > 70:  # Aşırı alım
                 confidence += 10
+
+            # Confidence'i 0-100 arasında tut
+            confidence = max(0, min(100, confidence))
 
             # Seviye belirle
             if confidence >= self.params['critical_confidence']:
@@ -344,6 +361,11 @@ class PumpDetectionEngine:
             else:
                 level = PumpLevel.LOW
 
+            # NaN değerleri handle et
+            volume_change = latest.get('volume_change', 0)
+            if pd.isna(volume_change):
+                volume_change = 0
+
             signal = PumpSignal(
                 symbol=symbol,
                 exchange=exchange,
@@ -352,7 +374,7 @@ class PumpDetectionEngine:
                 level=level,
                 confidence=confidence,
                 price_change_pct=price_change_5,
-                volume_change_pct=latest.get('volume_change', 0),
+                volume_change_pct=volume_change,
                 time_window_minutes=5,
                 current_price=latest['close'],
                 current_volume=latest['volume'],
@@ -386,14 +408,22 @@ class PumpDetectionEngine:
 
         # Volatilite spike varsa
         if volatility_ratio >= self.params['volatility_spike_threshold']:
-            confidence = min(100, 35 + (volatility_ratio - 2.5) * 12)
+            confidence = 35 + (volatility_ratio - 2.5) * 12
 
             # Fiyat ve hacim değişimleri ekle
             price_change = abs(latest.get('price_change_5', 0))
+            if pd.isna(price_change):
+                price_change = 0
+
             volume_ratio = latest.get('volume_ratio', 1)
+            if pd.isna(volume_ratio):
+                volume_ratio = 1
 
             if price_change > 5 and volume_ratio > 2:
                 confidence += 20
+
+            # Confidence'i 0-100 arasında tut
+            confidence = max(0, min(100, confidence))
 
             # Seviye belirle
             if confidence >= self.params['critical_confidence']:
@@ -405,6 +435,11 @@ class PumpDetectionEngine:
             else:
                 level = PumpLevel.LOW
 
+            # NaN değerleri handle et
+            volume_change = latest.get('volume_change', 0)
+            if pd.isna(volume_change):
+                volume_change = 0
+
             signal = PumpSignal(
                 symbol=symbol,
                 exchange=exchange,
@@ -412,8 +447,8 @@ class PumpDetectionEngine:
                 signal_type=PumpSignalType.VOLATILITY_SPIKE,
                 level=level,
                 confidence=confidence,
-                price_change_pct=latest.get('price_change_5', 0),
-                volume_change_pct=latest.get('volume_change', 0),
+                price_change_pct=price_change,
+                volume_change_pct=volume_change,
                 time_window_minutes=5,
                 current_price=latest['close'],
                 current_volume=latest['volume'],
@@ -455,7 +490,9 @@ class PumpDetectionEngine:
             avg_volume_ratio = last_5['volume_ratio'].mean()
 
             if total_price_change > 5 and avg_volume_ratio > 1.5:
-                confidence = min(100, 50 + total_price_change * 2)
+                confidence = 50 + total_price_change * 2
+                # Confidence'i 0-100 arasında tut
+                confidence = max(0, min(100, confidence))
 
                 # Seviye belirle
                 if confidence >= self.params['critical_confidence']:
@@ -467,6 +504,15 @@ class PumpDetectionEngine:
                 else:
                     level = PumpLevel.LOW
 
+                # NaN değerleri handle et
+                volume_change = latest.get('volume_change', 0)
+                if pd.isna(volume_change):
+                    volume_change = 0
+
+                rsi_val = latest.get('rsi', 50)
+                if pd.isna(rsi_val):
+                    rsi_val = 50
+
                 signal = PumpSignal(
                     symbol=symbol,
                     exchange=exchange,
@@ -475,14 +521,14 @@ class PumpDetectionEngine:
                     level=level,
                     confidence=confidence,
                     price_change_pct=total_price_change,
-                    volume_change_pct=latest.get('volume_change', 0),
+                    volume_change_pct=volume_change,
                     time_window_minutes=5,
                     current_price=latest['close'],
                     current_volume=latest['volume'],
                     indicators={
                         'green_bars': int(green_bars),
                         'avg_volume_ratio': float(avg_volume_ratio),
-                        'rsi': float(latest.get('rsi', 50))
+                        'rsi': float(rsi_val)
                     },
                     message=f"🎯 KOORDİNELİ ALIM: {green_bars}/5 yeşil bar! "
                            f"%{total_price_change:.1f} toplam artış."
@@ -510,7 +556,9 @@ class PumpDetectionEngine:
         if len(recent_signals) > 1:
             # Kombine signal oluştur
             max_confidence = max(s.confidence for s in recent_signals)
-            combined_confidence = min(100, max_confidence + (len(recent_signals) - 1) * 10)
+            combined_confidence = max_confidence + (len(recent_signals) - 1) * 10
+            # Confidence'i 0-100 arasında tut
+            combined_confidence = max(0, min(100, combined_confidence))
 
             # En yüksek seviyeyi al
             levels_order = [PumpLevel.LOW, PumpLevel.MEDIUM, PumpLevel.HIGH, PumpLevel.CRITICAL]
@@ -521,6 +569,15 @@ class PumpDetectionEngine:
 
             signal_types = [s.signal_type.value for s in recent_signals]
 
+            # NaN değerleri handle et
+            price_change_val = latest.get('price_change_5', 0)
+            if pd.isna(price_change_val):
+                price_change_val = 0
+
+            volume_change_val = latest.get('volume_change', 0)
+            if pd.isna(volume_change_val):
+                volume_change_val = 0
+
             combined = PumpSignal(
                 symbol=symbol,
                 exchange=exchange,
@@ -528,8 +585,8 @@ class PumpDetectionEngine:
                 signal_type=PumpSignalType.COORDINATED_BUYING,  # Genel tip
                 level=max_level,
                 confidence=combined_confidence,
-                price_change_pct=latest.get('price_change_5', 0),
-                volume_change_pct=latest.get('volume_change', 0),
+                price_change_pct=price_change_val,
+                volume_change_pct=volume_change_val,
                 time_window_minutes=5,
                 current_price=latest['close'],
                 current_volume=latest['volume'],
