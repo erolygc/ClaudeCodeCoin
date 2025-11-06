@@ -66,6 +66,13 @@ class TradeDashboard:
     def get_portfolio_summary(self):
         """Portfolio özetini al"""
         try:
+            # Eğer veritabanı yoksa varsayılan değerler döndür
+            if not Path(self.trades_db).exists():
+                return {
+                    'balance': 10000, 'total_pnl': 0, 'open_positions': 0,
+                    'open_value': 0, 'total_trades': 0, 'winning': 0, 'losing': 0, 'avg_pnl': 0
+                }
+
             conn = sqlite3.connect(self.trades_db)
 
             # Son bakiye
@@ -119,6 +126,10 @@ class TradeDashboard:
     def get_open_positions(self):
         """Açık pozisyonları al"""
         try:
+            # Eğer veritabanı yoksa boş DataFrame döndür
+            if not Path(self.trades_db).exists():
+                return pd.DataFrame()
+
             conn = sqlite3.connect(self.trades_db)
             query = """
                 SELECT symbol, entry_price, quantity, confidence,
@@ -243,6 +254,10 @@ class TradeDashboard:
     def plot_pnl_chart(self):
         """P&L zaman serisi grafiği"""
         try:
+            # Eğer veritabanı yoksa None döndür
+            if not Path(self.trades_db).exists():
+                return None
+
             conn = sqlite3.connect(self.trades_db)
             query = """
                 SELECT timestamp, balance, total_pnl
