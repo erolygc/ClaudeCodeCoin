@@ -285,10 +285,10 @@ class PumpDetectionEngine:
             else:
                 level = PumpLevel.LOW
 
-            # NaN değerleri handle et
-            volume_change = latest.get('volume_change', 0)
-            if pd.isna(volume_change):
-                volume_change = 0
+            # Calculate actual volume spike percentage
+            # volume_ratio of 3.0 means 200% increase (3x = 300% of normal = +200%)
+            # volume_ratio of 5.0 means 400% increase (5x = 500% of normal = +400%)
+            volume_spike_pct = (volume_ratio - 1) * 100
 
             signal = PumpSignal(
                 symbol=symbol,
@@ -298,7 +298,7 @@ class PumpDetectionEngine:
                 level=level,
                 confidence=confidence,
                 price_change_pct=price_change,
-                volume_change_pct=volume_change,
+                volume_change_pct=volume_spike_pct,
                 time_window_minutes=5,
                 current_price=latest['close'],
                 current_volume=latest['volume'],
@@ -361,10 +361,8 @@ class PumpDetectionEngine:
             else:
                 level = PumpLevel.LOW
 
-            # NaN değerleri handle et
-            volume_change = latest.get('volume_change', 0)
-            if pd.isna(volume_change):
-                volume_change = 0
+            # Calculate actual volume spike percentage based on ratio
+            volume_spike_pct = (volume_ratio - 1) * 100 if volume_ratio > 1 else 0
 
             signal = PumpSignal(
                 symbol=symbol,
@@ -374,7 +372,7 @@ class PumpDetectionEngine:
                 level=level,
                 confidence=confidence,
                 price_change_pct=price_change_5,
-                volume_change_pct=volume_change,
+                volume_change_pct=volume_spike_pct,
                 time_window_minutes=5,
                 current_price=latest['close'],
                 current_volume=latest['volume'],
@@ -435,10 +433,8 @@ class PumpDetectionEngine:
             else:
                 level = PumpLevel.LOW
 
-            # NaN değerleri handle et
-            volume_change = latest.get('volume_change', 0)
-            if pd.isna(volume_change):
-                volume_change = 0
+            # Calculate actual volume spike percentage based on ratio
+            volume_spike_pct = (volume_ratio - 1) * 100 if volume_ratio > 1 else 0
 
             signal = PumpSignal(
                 symbol=symbol,
@@ -448,7 +444,7 @@ class PumpDetectionEngine:
                 level=level,
                 confidence=confidence,
                 price_change_pct=price_change,
-                volume_change_pct=volume_change,
+                volume_change_pct=volume_spike_pct,
                 time_window_minutes=5,
                 current_price=latest['close'],
                 current_volume=latest['volume'],
@@ -504,10 +500,8 @@ class PumpDetectionEngine:
                 else:
                     level = PumpLevel.LOW
 
-                # NaN değerleri handle et
-                volume_change = latest.get('volume_change', 0)
-                if pd.isna(volume_change):
-                    volume_change = 0
+                # Calculate actual volume spike percentage based on avg ratio
+                volume_spike_pct = (avg_volume_ratio - 1) * 100 if avg_volume_ratio > 1 else 0
 
                 rsi_val = latest.get('rsi', 50)
                 if pd.isna(rsi_val):
@@ -521,7 +515,7 @@ class PumpDetectionEngine:
                     level=level,
                     confidence=confidence,
                     price_change_pct=total_price_change,
-                    volume_change_pct=volume_change,
+                    volume_change_pct=volume_spike_pct,
                     time_window_minutes=5,
                     current_price=latest['close'],
                     current_volume=latest['volume'],
@@ -574,9 +568,11 @@ class PumpDetectionEngine:
             if pd.isna(price_change_val):
                 price_change_val = 0
 
-            volume_change_val = latest.get('volume_change', 0)
-            if pd.isna(volume_change_val):
-                volume_change_val = 0
+            # Calculate actual volume spike percentage based on ratio
+            volume_ratio = latest.get('volume_ratio', 1)
+            if pd.isna(volume_ratio):
+                volume_ratio = 1
+            volume_spike_pct = (volume_ratio - 1) * 100 if volume_ratio > 1 else 0
 
             combined = PumpSignal(
                 symbol=symbol,
@@ -586,7 +582,7 @@ class PumpDetectionEngine:
                 level=max_level,
                 confidence=combined_confidence,
                 price_change_pct=price_change_val,
-                volume_change_pct=volume_change_val,
+                volume_change_pct=volume_spike_pct,
                 time_window_minutes=5,
                 current_price=latest['close'],
                 current_volume=latest['volume'],

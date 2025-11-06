@@ -40,7 +40,7 @@ TRAILING_STOP_PERCENT = 3.0  # Trailing stop: En yüksek değerden %3 düşerse 
 TRADING_FEE_PERCENT = 0.1  # %0.1 işlem ücreti (Binance maker/taker ortalama)
 
 # Database
-TRADES_DB = "data_output/paper_trades.db"
+TRADES_DB = "data_output/paper_trading.db"
 PERFORMANCE_LOG = "logs/paper_trading_performance.log"
 
 # Exchange bilgileri (Pump scanner ile uyumlu)
