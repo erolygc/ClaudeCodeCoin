@@ -300,7 +300,7 @@ def main():
         st.header("⚙️ Ayarlar")
 
         # Refresh button
-        if st.button("🔄 Yenile", use_container_width=True):
+        if st.button("🔄 Yenile", width='stretch'):
             st.rerun()
 
         st.markdown("---")
@@ -369,7 +369,7 @@ def main():
         st.subheader(f"📈 {symbol_input} - Live Chart")
         fig = dashboard.plot_candlestick(symbol_input, exchange)
         if fig:
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
 
     with tab2:
         st.subheader("💼 Açık Pozisyonlar")
@@ -394,7 +394,7 @@ def main():
                     'sl_distance': '{:+.2f}%',
                     'tp_distance': '{:+.2f}%'
                 }),
-                use_container_width=True,
+                width='stretch',
                 height=400
             )
         else:
@@ -415,7 +415,7 @@ def main():
                     'Fiyat Değişimi': '{:+.2f}%',
                     'Hacim Değişimi': '{:+.2f}%'
                 }),
-                use_container_width=True,
+                width='stretch',
                 height=500
             )
         else:
@@ -430,7 +430,7 @@ def main():
             st.markdown("#### 💹 P&L Grafiği")
             pnl_fig = dashboard.plot_pnl_chart()
             if pnl_fig:
-                st.plotly_chart(pnl_fig, use_container_width=True)
+                st.plotly_chart(pnl_fig, width='stretch')
             else:
                 st.info("Henüz trading geçmişi yok")
 
