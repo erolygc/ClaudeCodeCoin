@@ -22,7 +22,7 @@ TAKE_PROFIT_PERCENT = {
 
 # Pozisyon Açma Kriterleri - TEST MODE (Gevşek şartlar)
 MIN_CONFIDENCE_TO_TRADE = 50.0  # TEST: %50 - Daha fazla sinyal için düşük eşik
-MIN_VOLUME_SPIKE = 200.0  # TEST: %200 - Orta seviye volume spike'ları da yakala
+MIN_VOLUME_SPIKE = 0.0  # TEST MODE: Volume şartı YOK - Sadece fiyat momentum yeterli
 
 # Pozisyon Boyutlandırma (Confidence'a göre)
 POSITION_SIZE_MULTIPLIER = {
