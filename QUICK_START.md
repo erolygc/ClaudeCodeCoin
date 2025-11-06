@@ -1,20 +1,46 @@
 # ClaudeCodeCoin - Hızlı Başlangıç
 
+## 📦 İLK KURULUM (Sadece İlk Kez)
+
+Dashboard için gerekli kütüphaneleri yükleyin:
+
+```bash
+pip install streamlit plotly
+```
+
+veya tüm gereksinimleri yükleyin:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
 ## 🚀 TEK KOMUTLA BAŞLAT
 
+### Windows
 ```powershell
 cd C:\Users\Botai\Desktop\Projeler\ClaudeCodeCoin
 .\START_SYSTEM.ps1
+```
+
+### Linux/Mac
+```bash
+cd /home/user/ClaudeCodeCoin
+./START_SYSTEM.sh
 ```
 
 Bu script:
 - ✅ En son kod güncellemelerini çeker (git pull)
 - ✅ Konfigürasyonu kontrol eder
 - ✅ Database'i doğrular
-- ✅ 3 komponenti otomatik başlatır:
-  1. Data Collector (Gate.io)
-  2. Pump Scanner
-  3. Paper Trading Engine
+- ✅ 4 komponenti otomatik başlatır:
+  1. **Data Collector** (Gate.io WebSocket)
+  2. **Pump Scanner** (Alert Generation)
+  3. **Paper Trading Engine** (Auto-Trading)
+  4. **Dashboard** (Web UI - http://localhost:8501)
+
+**Dashboard otomatik açılır!** Sistemler senkronize olup trade açılacak!
 
 **2-3 dakika bekleyin**, sistemler senkronize olacak ve trade açılacak!
 
@@ -111,10 +137,31 @@ Market sakin veya Pump Scanner çalışmıyor. Terminal 2'yi başlat.
 
 ## 📈 PERFORMANS İZLEME
 
-### Gerçek Zamanlı Dashboard (Gelecekte)
+### 🎨 Gerçek Zamanlı Dashboard (ÇOK ÖNEMLİ!)
+
+Dashboard otomatik başlatılır veya manuel başlatabilirsiniz:
+
+**Windows:**
 ```powershell
-streamlit run Phase7_PaperTrading\dashboard.py
+streamlit run dashboard.py
 ```
+
+**Linux/Mac:**
+```bash
+streamlit run dashboard.py
+```
+
+**Dashboard Özellikleri:**
+- 💰 **Portfolio Özeti**: Bakiye, Win Rate, Açık Pozisyonlar, Ortalama P&L
+- 📈 **Candlestick Grafikleri**: Her coin için gerçek zamanlı fiyat ve hacim grafikleri
+- 💼 **Pozisyon Takibi**: Tüm açık pozisyonlarınızı canlı görün
+- 🚨 **Alert Feed**: Son pump alertlerini anlık takip edin
+- 📊 **Analytics**: P&L grafiği, trade istatistikleri, performans metrikleri
+
+**Dashboard'a Erişim:**
+- Browser otomatik açılır: `http://localhost:8501`
+- Manuel erişim: Tarayıcınızda `http://localhost:8501` adresini açın
+- Auto-refresh: Her 30 saniyede otomatik yenilenir
 
 ### Log Dosyaları
 ```powershell
@@ -155,4 +202,4 @@ Sorun mu var?
 ---
 
 **Son Güncelleme**: 2025-11-06
-**Version**: 1.2
+**Version**: 2.0 - Dashboard Added!

@@ -117,7 +117,7 @@ Write-Host "  STARTUP INSTRUCTIONS" -ForegroundColor Cyan
 Write-Host "================================================================================" -ForegroundColor Cyan
 Write-Host ""
 
-Write-Host "Open 3 separate PowerShell terminals and run:" -ForegroundColor White
+Write-Host "Open 4 separate PowerShell terminals and run:" -ForegroundColor White
 Write-Host ""
 
 Write-Host "TERMINAL 1 - Data Collector:" -ForegroundColor Yellow
@@ -133,6 +133,12 @@ Write-Host ""
 Write-Host "TERMINAL 3 - Paper Trading:" -ForegroundColor Yellow
 Write-Host "  cd $scriptDir\Phase7_PaperTrading" -ForegroundColor Gray
 Write-Host "  python paper_trading_engine.py" -ForegroundColor White
+Write-Host ""
+
+Write-Host "TERMINAL 4 - Dashboard (Web UI):" -ForegroundColor Yellow
+Write-Host "  cd $scriptDir" -ForegroundColor Gray
+Write-Host "  streamlit run dashboard.py" -ForegroundColor White
+Write-Host "  Browser: http://localhost:8501" -ForegroundColor Cyan
 Write-Host ""
 
 Write-Host "================================================================================" -ForegroundColor Cyan
@@ -164,27 +170,47 @@ Write-Host "[AUTO-START] Launching all components..." -ForegroundColor Green
 Write-Host ""
 
 # Start Data Collector
-Write-Host "[1/3] Starting Data Collector..." -ForegroundColor Yellow
+Write-Host "[1/4] Starting Data Collector..." -ForegroundColor Yellow
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$scriptDir'; python Phase1_DataBackbone\collectors\multi_coin_gateio_collector_1000coins.py"
 Start-Sleep -Seconds 3
 
 # Start Pump Scanner
-Write-Host "[2/3] Starting Pump Scanner..." -ForegroundColor Yellow
+Write-Host "[2/4] Starting Pump Scanner..." -ForegroundColor Yellow
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$scriptDir\Phase6_PumpDetection'; python realtime_pump_scanner.py"
 Start-Sleep -Seconds 3
 
 # Start Paper Trading
-Write-Host "[3/3] Starting Paper Trading..." -ForegroundColor Yellow
+Write-Host "[3/4] Starting Paper Trading..." -ForegroundColor Yellow
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$scriptDir\Phase7_PaperTrading'; python paper_trading_engine.py"
+Start-Sleep -Seconds 3
+
+# Start Dashboard
+Write-Host "[4/4] Starting Dashboard (Web UI)..." -ForegroundColor Yellow
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$scriptDir'; streamlit run dashboard.py"
+Start-Sleep -Seconds 2
 
 Write-Host ""
 Write-Host "================================================================================" -ForegroundColor Green
 Write-Host "  ALL SYSTEMS LAUNCHED!" -ForegroundColor Green
 Write-Host "================================================================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "Check the 3 new terminal windows for live status." -ForegroundColor White
+Write-Host "Check the 4 new terminal windows:" -ForegroundColor White
+Write-Host "  1. Data Collector - Gathering real-time data" -ForegroundColor Gray
+Write-Host "  2. Pump Scanner - Detecting opportunities" -ForegroundColor Gray
+Write-Host "  3. Paper Trading - Auto-trading" -ForegroundColor Gray
+Write-Host "  4. Dashboard - Web UI" -ForegroundColor Gray
+Write-Host ""
+Write-Host "Dashboard opening at: http://localhost:8501" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Wait 2-3 minutes for first trades to open." -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Press any key to exit this window..." -ForegroundColor Gray
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+
+# Try to open browser
+Start-Sleep -Seconds 3
+try {
+    Start-Process "http://localhost:8501"
+} catch {
+    Write-Host "Could not auto-open browser. Please open manually: http://localhost:8501" -ForegroundColor Yellow
+}
