@@ -4,6 +4,7 @@ Pozisyon açma, kapama ve yönetim modülü
 """
 
 import sqlite3
+import pandas as pd
 from datetime import datetime, timedelta
 from pathlib import Path
 import logging
@@ -214,9 +215,57 @@ class PositionManager:
 
         return True, "OK"
 
+    def _calculate_atr_stop_loss(self, symbol: str, entry_price: float) -> float:
+        """Calculate ATR-based dynamic stop loss percentage"""
+        try:
+            # Get recent candles to calculate ATR
+            conn = sqlite3.connect(self.db_path)
+            query = """
+                SELECT high, low, close
+                FROM klines
+                WHERE symbol = ?
+                ORDER BY timestamp DESC
+                LIMIT 20
+            """
+            df = pd.read_sql_query(query, conn, params=(symbol,))
+            conn.close()
+
+            if len(df) < 14:
+                # Not enough data, use default
+                return config.STOP_LOSS_PERCENT
+
+            # Calculate ATR
+            df = df.iloc[::-1]  # Reverse to chronological order
+            df['high_low'] = df['high'] - df['low']
+            df['high_close'] = abs(df['high'] - df['close'].shift())
+            df['low_close'] = abs(df['low'] - df['close'].shift())
+            df['tr'] = df[['high_low', 'high_close', 'low_close']].max(axis=1)
+            atr = df['tr'].rolling(window=14).mean().iloc[-1]
+
+            # Calculate ATR as percentage of price
+            atr_pct = (atr / entry_price) * 100
+
+            # Dynamic stop loss based on volatility
+            if atr_pct > 5.0:  # High volatility
+                stop_loss_pct = min(10.0, atr_pct * 1.5)  # Wider stop, max 10%
+            elif atr_pct < 2.0:  # Low volatility
+                stop_loss_pct = max(2.5, atr_pct * 2.0)  # Tighter stop, min 2.5%
+            else:  # Medium volatility
+                stop_loss_pct = atr_pct * 1.8
+
+            # Ensure within reasonable bounds
+            stop_loss_pct = max(2.5, min(10.0, stop_loss_pct))
+
+            logger.info(f"[ATR] {symbol}: ATR={atr_pct:.2f}%, Dynamic SL={stop_loss_pct:.2f}%")
+            return stop_loss_pct
+
+        except Exception as e:
+            logger.warning(f"Could not calculate ATR for {symbol}: {e}")
+            return config.STOP_LOSS_PERCENT
+
     def open_position(self, symbol: str, entry_price: float, confidence: float,
                      volume_spike: float) -> Optional[Position]:
-        """Yeni pozisyon aç"""
+        """Yeni pozisyon ac (WITH DYNAMIC POSITION SIZING & ATR STOP LOSS)"""
 
         # Confidence seviyesini belirle
         if confidence >= 85:
@@ -228,14 +277,24 @@ class PositionManager:
         else:
             conf_level = 'LOW'
 
-        # Pozisyon büyüklüğünü hesapla
-        max_position_value = self.balance * (config.MAX_POSITION_SIZE_PERCENT / 100)
+        # NEW: Dynamic position sizing based on signal quality
+        base_position_value = self.balance * (config.MAX_POSITION_SIZE_PERCENT / 100)
         position_multiplier = config.POSITION_SIZE_MULTIPLIER[conf_level]
-        position_value = max_position_value * position_multiplier
+
+        # NEW: Additional scaling based on volume confirmation
+        if volume_spike > 200:  # Strong volume confirmation
+            position_multiplier *= 1.2
+        elif volume_spike > 100:
+            position_multiplier *= 1.1
+
+        position_value = base_position_value * position_multiplier
+
+        # Ensure position value doesn't exceed balance
+        position_value = min(position_value, self.balance * 0.15)  # Max 15% per position
 
         # Minimum pozisyon kontrolü
         if position_value < config.MIN_POSITION_SIZE:
-            logger.warning(f"Pozisyon büyüklüğü minimum seviyenin altında: ${position_value:.2f}")
+            logger.warning(f"Pozisyon buyuklugu minimum seviyenin altinda: ${position_value:.2f}")
             return None
 
         # Pozisyon açılabilir mi kontrol et
@@ -252,8 +311,11 @@ class PositionManager:
         # Quantity hesapla
         quantity = position_value / entry_price
 
-        # Stop Loss ve Take Profit hesapla
-        stop_loss = entry_price * (1 - config.STOP_LOSS_PERCENT / 100)
+        # NEW: ATR-based dynamic stop loss
+        stop_loss_percent = self._calculate_atr_stop_loss(symbol, entry_price)
+        stop_loss = entry_price * (1 - stop_loss_percent / 100)
+
+        # Take Profit hesapla
         take_profit_percent = config.TAKE_PROFIT_PERCENT[conf_level]
         take_profit = entry_price * (1 + take_profit_percent / 100)
 

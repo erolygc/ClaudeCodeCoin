@@ -125,13 +125,265 @@ class PumpDetectionEngine:
             'low_confidence': 30.0,
             'medium_confidence': 50.0,
             'high_confidence': 70.0,
-            'critical_confidence': 85.0
+            'critical_confidence': 85.0,
+
+            # NEW: RSI Filtering
+            'rsi_overbought': 70.0,     # RSI > 70 = overbought risk
+            'rsi_oversold': 30.0,       # RSI < 30 = oversold risk
+            'rsi_optimal_min': 40.0,    # Optimal entry zone
+            'rsi_optimal_max': 65.0,    # Optimal entry zone
+
+            # NEW: Multi-Signal Bonuses
+            'multi_signal_bonus': 15.0,          # Bonus per additional signal
+            'coordinated_buying_multiplier': 1.2, # 20% boost for coordinated
+
+            # NEW: Liquidity Filters
+            'min_24h_volume': 100000.0,  # Minimum $100k daily volume
+            'max_spread_percent': 0.5     # Maximum 0.5% spread
         }
+
+        # NEW: Signal type historical win rates (will be updated by backtest)
+        self.signal_win_rates = {
+            'coordinated_buying': 1.0,  # Default: no adjustment
+            'volume_spike': 1.0,
+            'price_surge': 1.0,
+            'volatility_spike': 1.0
+        }
+
+        # NEW: Coin performance tracking
+        self.coin_performance = {}  # Will be loaded from database
+
+        # NEW: Time-based performance (hourly win rates)
+        self.hourly_performance = {
+            '00-04': 0.8,   # Night hours - conservative
+            '04-08': 0.9,   # Early morning
+            '08-12': 1.1,   # Morning - bullish
+            '12-16': 1.15,  # Afternoon - most active
+            '16-20': 1.0,   # Evening
+            '20-24': 0.9    # Night - moderate
+        }
+
+        # Load coin performance data
+        self._load_coin_performance()
+
+        # Cache for BTC/ETH trends
+        self.market_context_cache = {}
+        self.market_context_cache_time = None
+
+    def _load_coin_performance(self):
+        """Load historical performance data for each coin"""
+        try:
+            conn = sqlite3.connect(self.db_path.replace('binance_data.db', 'paper_trading.db'))
+            query = """
+                SELECT symbol,
+                       COUNT(*) as total_trades,
+                       SUM(CASE WHEN pnl > 0 THEN 1 ELSE 0 END) as wins,
+                       SUM(CASE WHEN pnl <= 0 THEN 1 ELSE 0 END) as losses
+                FROM positions
+                WHERE status = 'CLOSED'
+                GROUP BY symbol
+                HAVING total_trades >= 3
+            """
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+
+            for _, row in df.iterrows():
+                win_rate = row['wins'] / row['total_trades'] if row['total_trades'] > 0 else 0.5
+                self.coin_performance[row['symbol']] = {
+                    'total_trades': row['total_trades'],
+                    'win_rate': win_rate,
+                    'wins': row['wins'],
+                    'losses': row['losses']
+                }
+
+            logger.info(f"Loaded performance data for {len(self.coin_performance)} coins")
+        except Exception as e:
+            logger.warning(f"Could not load coin performance: {e}")
+            self.coin_performance = {}
+
+    def _get_market_context(self, exchange: str = "gate.io") -> Dict[str, str]:
+        """Get BTC and ETH trend context for market filtering"""
+        try:
+            # Cache for 5 minutes
+            if (self.market_context_cache_time and
+                (datetime.now() - self.market_context_cache_time).total_seconds() < 300):
+                return self.market_context_cache
+
+            context = {}
+
+            # Get BTC trend
+            btc_df = self._get_data("BTC_USDT", exchange, lookback_bars=30)
+            if btc_df is not None and len(btc_df) >= 20:
+                btc_df = self._calculate_indicators(btc_df)
+                latest = btc_df.iloc[-1]
+                prev = btc_df.iloc[-10]  # 10 bars ago
+
+                price_change = ((latest['close'] - prev['close']) / prev['close']) * 100
+                context['btc_trend'] = 'up' if price_change > 1 else 'down' if price_change < -1 else 'neutral'
+                context['btc_rsi'] = latest.get('rsi', 50)
+            else:
+                context['btc_trend'] = 'neutral'
+                context['btc_rsi'] = 50
+
+            # Get ETH trend
+            eth_df = self._get_data("ETH_USDT", exchange, lookback_bars=30)
+            if eth_df is not None and len(eth_df) >= 20:
+                eth_df = self._calculate_indicators(eth_df)
+                latest = eth_df.iloc[-1]
+                prev = eth_df.iloc[-10]
+
+                price_change = ((latest['close'] - prev['close']) / prev['close']) * 100
+                context['eth_trend'] = 'up' if price_change > 1 else 'down' if price_change < -1 else 'neutral'
+                context['eth_rsi'] = latest.get('rsi', 50)
+            else:
+                context['eth_trend'] = 'neutral'
+                context['eth_rsi'] = 50
+
+            self.market_context_cache = context
+            self.market_context_cache_time = datetime.now()
+
+            return context
+        except Exception as e:
+            logger.warning(f"Could not get market context: {e}")
+            return {'btc_trend': 'neutral', 'eth_trend': 'neutral', 'btc_rsi': 50, 'eth_rsi': 50}
+
+    def _get_time_multiplier(self) -> float:
+        """Get time-based confidence multiplier based on hour of day"""
+        current_hour = datetime.now().hour
+
+        # Determine time range
+        if 0 <= current_hour < 4:
+            time_range = '00-04'
+        elif 4 <= current_hour < 8:
+            time_range = '04-08'
+        elif 8 <= current_hour < 12:
+            time_range = '08-12'
+        elif 12 <= current_hour < 16:
+            time_range = '12-16'
+        elif 16 <= current_hour < 20:
+            time_range = '16-20'
+        else:
+            time_range = '20-24'
+
+        return self.hourly_performance.get(time_range, 1.0)
+
+    def _apply_rsi_filter(self, confidence: float, rsi: float) -> float:
+        """Apply RSI-based confidence adjustment"""
+        if pd.isna(rsi):
+            return confidence
+
+        # Overbought zone (RSI > 70) - reduce confidence
+        if rsi > self.params['rsi_overbought']:
+            penalty = (rsi - 70) * 0.5  # 0.5% penalty per RSI point above 70
+            confidence *= (1 - min(penalty / 100, 0.3))  # Max 30% reduction
+
+        # Oversold zone (RSI < 30) - reduce confidence (risk of further drop)
+        elif rsi < self.params['rsi_oversold']:
+            penalty = (30 - rsi) * 0.3  # 0.3% penalty per RSI point below 30
+            confidence *= (1 - min(penalty / 100, 0.2))  # Max 20% reduction
+
+        # Optimal zone (40-65) - slight bonus
+        elif self.params['rsi_optimal_min'] <= rsi <= self.params['rsi_optimal_max']:
+            confidence *= 1.05  # 5% bonus for optimal RSI
+
+        return confidence
+
+    def _apply_market_context_filter(self, confidence: float, market_context: Dict) -> float:
+        """Apply BTC/ETH market context filtering"""
+        btc_trend = market_context.get('btc_trend', 'neutral')
+        eth_trend = market_context.get('eth_trend', 'neutral')
+
+        # Both BTC and ETH down = high risk
+        if btc_trend == 'down' and eth_trend == 'down':
+            confidence *= 0.6  # 40% reduction
+
+        # One down, one neutral = moderate risk
+        elif (btc_trend == 'down' or eth_trend == 'down') and \
+             (btc_trend != 'up' and eth_trend != 'up'):
+            confidence *= 0.8  # 20% reduction
+
+        # Both up = bullish market
+        elif btc_trend == 'up' and eth_trend == 'up':
+            confidence *= 1.15  # 15% bonus
+
+        # One up, rest neutral = slight bullish
+        elif btc_trend == 'up' or eth_trend == 'up':
+            confidence *= 1.05  # 5% bonus
+
+        return confidence
+
+    def _apply_coin_performance_filter(self, confidence: float, symbol: str) -> float:
+        """Apply historical coin performance filtering"""
+        if symbol not in self.coin_performance:
+            return confidence  # No history, no adjustment
+
+        perf = self.coin_performance[symbol]
+        win_rate = perf['win_rate']
+
+        # Low win rate coins (< 30%) - blacklist
+        if win_rate < 0.3 and perf['total_trades'] >= 5:
+            return 0  # Blacklist this coin
+
+        # High win rate coins (> 70%) - boost
+        if win_rate > 0.7:
+            confidence *= 1.3  # 30% bonus
+
+        # Medium-high win rate (50-70%) - slight boost
+        elif win_rate > 0.5:
+            boost = 1 + ((win_rate - 0.5) * 0.4)  # Linear scale 1.0 to 1.1
+            confidence *= boost
+
+        # Low win rate (30-50%) - penalty
+        elif win_rate < 0.5:
+            penalty = 1 - ((0.5 - win_rate) * 0.4)  # Linear scale 0.92 to 1.0
+            confidence *= penalty
+
+        return confidence
+
+    def _check_multi_timeframe_alignment(self, symbol: str, exchange: str) -> float:
+        """Check if trends align across 1m, 5m, and 15m timeframes"""
+        try:
+            # Get longer timeframe data (we'll simulate 5m and 15m from 1m data)
+            df = self._get_data(symbol, exchange, lookback_bars=60)
+            if df is None or len(df) < 30:
+                return 1.0  # No adjustment if not enough data
+
+            df = self._calculate_indicators(df)
+
+            # 1m trend (last 5 bars)
+            trend_1m = df['close'].iloc[-5:].mean() > df['close'].iloc[-10:-5].mean()
+
+            # 5m trend (simulate: last 25 bars vs previous 25)
+            trend_5m = df['close'].iloc[-25:].mean() > df['close'].iloc[-50:-25].mean()
+
+            # 15m trend (simulate: last 15 bars vs previous 15)
+            if len(df) >= 30:
+                trend_15m = df['close'].iloc[-15:].mean() > df['close'].iloc[-30:-15].mean()
+            else:
+                trend_15m = trend_1m
+
+            # All trends aligned UP = strong bullish
+            if trend_1m and trend_5m and trend_15m:
+                return 1.2  # 20% bonus
+
+            # 1m up but 5m down = fake pump risk
+            elif trend_1m and not trend_5m:
+                return 0.7  # 30% penalty
+
+            # 2 out of 3 aligned
+            elif sum([trend_1m, trend_5m, trend_15m]) >= 2:
+                return 1.1  # 10% bonus
+
+            return 1.0  # Neutral
+
+        except Exception as e:
+            logger.warning(f"Multi-timeframe check failed for {symbol}: {e}")
+            return 1.0
 
     def analyze_symbol(self, symbol: str, exchange: str = "gate.io",
                       lookback_bars: int = 120) -> List[PumpSignal]:
         """
-        Sembol için pump analizi yap
+        Sembol için pump analizi yap (WITH ALL IMPROVEMENTS)
 
         Returns:
             Tespit edilen pump sinyalleri listesi
@@ -145,6 +397,15 @@ class PumpDetectionEngine:
 
         # İndikatörleri hesapla
         df = self._calculate_indicators(df)
+
+        # NEW: Get market context (BTC/ETH trends)
+        market_context = self._get_market_context(exchange)
+
+        # NEW: Get multi-timeframe alignment
+        timeframe_multiplier = self._check_multi_timeframe_alignment(symbol, exchange)
+
+        # NEW: Get time-based multiplier
+        time_multiplier = self._get_time_multiplier()
 
         # Sinyalleri tespit et
         signals = []
@@ -168,10 +429,68 @@ class PumpDetectionEngine:
         # 5. Sinyalleri birleştir ve skorla
         combined_signals = self._combine_signals(signals, df, symbol, exchange)
 
-        # Confidence'a göre sırala
-        combined_signals.sort(key=lambda x: x.confidence, reverse=True)
+        # NEW: Apply all filters to each signal
+        filtered_signals = []
+        latest_rsi = df.iloc[-1].get('rsi', 50)
 
-        return combined_signals
+        for signal in combined_signals:
+            confidence = signal.confidence
+
+            # Apply RSI filter
+            confidence = self._apply_rsi_filter(confidence, latest_rsi)
+
+            # Apply market context filter (BTC/ETH trends)
+            confidence = self._apply_market_context_filter(confidence, market_context)
+
+            # Apply coin performance filter (historical win rate)
+            confidence = self._apply_coin_performance_filter(confidence, symbol)
+
+            # Apply multi-timeframe alignment
+            confidence *= timeframe_multiplier
+
+            # Apply time-based multiplier
+            confidence *= time_multiplier
+
+            # Apply signal type win rate (from backtest)
+            signal_type_key = signal.signal_type.value
+            if signal_type_key in self.signal_win_rates:
+                confidence *= self.signal_win_rates[signal_type_key]
+
+            # Ensure confidence stays in 0-100 range
+            confidence = max(0, min(100, confidence))
+
+            # If confidence dropped too low, skip this signal
+            if confidence < 20:  # Minimum threshold after all filters
+                continue
+
+            # Update signal confidence and level
+            signal.confidence = confidence
+
+            # Recalculate level based on new confidence
+            if confidence >= self.params['critical_confidence']:
+                signal.level = PumpLevel.CRITICAL
+            elif confidence >= self.params['high_confidence']:
+                signal.level = PumpLevel.HIGH
+            elif confidence >= self.params['medium_confidence']:
+                signal.level = PumpLevel.MEDIUM
+            else:
+                signal.level = PumpLevel.LOW
+
+            # Add filter info to indicators
+            signal.indicators['filters_applied'] = {
+                'rsi': latest_rsi,
+                'market_context': market_context,
+                'timeframe_multiplier': timeframe_multiplier,
+                'time_multiplier': time_multiplier,
+                'original_confidence': signal.confidence
+            }
+
+            filtered_signals.append(signal)
+
+        # Confidence'a göre sırala
+        filtered_signals.sort(key=lambda x: x.confidence, reverse=True)
+
+        return filtered_signals
 
     def _get_data(self, symbol: str, exchange: str, limit: int) -> Optional[pd.DataFrame]:
         """Veritabanından veri çek"""
@@ -553,9 +872,15 @@ class PumpDetectionEngine:
                          if (latest_timestamp - s.timestamp).total_seconds() < 300]
 
         if len(recent_signals) > 1:
-            # Kombine signal oluştur
+            # NEW: Improved multi-signal combination
             max_confidence = max(s.confidence for s in recent_signals)
-            combined_confidence = max_confidence + (len(recent_signals) - 1) * 10
+
+            # NEW: Use configurable multi-signal bonus
+            combined_confidence = max_confidence + (len(recent_signals) - 1) * self.params['multi_signal_bonus']
+
+            # NEW: Apply coordinated buying multiplier
+            combined_confidence *= self.params['coordinated_buying_multiplier']
+
             # Confidence'i 0-100 arasında tut
             combined_confidence = max(0, min(100, combined_confidence))
 
