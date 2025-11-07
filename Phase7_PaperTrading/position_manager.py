@@ -199,16 +199,16 @@ class PositionManager:
         logger.info(f"[POSITIONS] Acik pozisyon: {len(self.open_positions)} adet")
 
     def can_open_position(self, symbol: str, required_capital: float) -> Tuple[bool, str]:
-        """Yeni pozisyon açılabilir mi kontrol et"""
-        # Zaten bu sembolde pozisyon var mı?
+        """Yeni pozisyon acilabilir mi kontrol et"""
+        # Zaten bu sembolde pozisyon var mi?
         if symbol in self.open_positions:
-            return False, f"Zaten {symbol} için açık pozisyon var"
+            return False, f"Zaten {symbol} icin acik pozisyon var"
 
-        # Maksimum pozisyon sayısına ulaşıldı mı?
+        # Maksimum pozisyon sayisina ulasildi mi?
         if len(self.open_positions) >= config.MAX_OPEN_POSITIONS:
-            return False, f"Maksimum {config.MAX_OPEN_POSITIONS} açık pozisyon sınırına ulaşıldı"
+            return False, f"Maksimum {config.MAX_OPEN_POSITIONS} acik pozisyon sinirina ulasildi"
 
-        # Yeterli bakiye var mı?
+        # Yeterli bakiye var mi?
         if required_capital > self.balance:
             return False, f"Yetersiz bakiye. Gerekli: ${required_capital:.2f}, Mevcut: ${self.balance:.2f}"
 

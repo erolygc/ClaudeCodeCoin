@@ -52,7 +52,7 @@ st.markdown("""
 
 # Database paths
 DB_PATH = "data_output/binance_data.db"
-TRADES_DB = "data_output/paper_trading.db"
+TRADES_DB = "Phase7_PaperTrading/data_output/paper_trading.db"  # Paper trading runs from Phase7_PaperTrading/
 ALERTS_DIR = Path("pump_alerts")
 
 
