@@ -48,8 +48,8 @@ LIQUIDATION_BUFFER = 0.02  # %2 buffer from liquidation price
 MAX_DRAWDOWN_PERCENT = 30.0  # Maksimum %30 drawdown, sonra dur
 
 # Position Limits
-MIN_CONFIDENCE_TO_TRADE = 55.0  # Futures için daha yüksek threshold (50→55)
-MIN_VOLUME_SPIKE = 0.0  # Volume filtresi yok (pump detection yeterli)
+MIN_CONFIDENCE_TO_TRADE = 65.0  # Futures için daha yüksek threshold - WIN RATE %60+ icin
+MIN_VOLUME_SPIKE = 100.0  # Volume spike minimum %100 olmali (daha guclu sinyaller)
 
 # ============================================================================
 # ORDER EXECUTION
