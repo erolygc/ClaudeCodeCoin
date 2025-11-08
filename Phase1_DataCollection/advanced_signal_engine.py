@@ -100,15 +100,15 @@ class AdvancedSignalEngine:
     }
 
     def __init__(self,
-                 db_path: str = "data_output/binance_data.db",
-                 multi_tf_dir: str = "data_multi_timeframe",
+                 db_path: str = None,
+                 multi_tf_dir: str = None,
                  min_confidence: float = 70.0):
         """
         Initialize Advanced Signal Engine
 
         Args:
-            db_path: Path to source database
-            multi_tf_dir: Multi-timeframe data directory
+            db_path: Path to source database (default: auto-detect)
+            multi_tf_dir: Multi-timeframe data directory (default: auto-detect)
             min_confidence: Minimum confidence threshold (0-100)
         """
         self.aggregator = TimeframeAggregator(db_path, multi_tf_dir)

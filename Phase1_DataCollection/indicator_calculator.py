@@ -431,9 +431,15 @@ class IndicatorCalculator:
 
     def _ultimate_oscillator(self, df: pd.DataFrame, period1: int = 7, period2: int = 14, period3: int = 28) -> pd.Series:
         """Ultimate Oscillator"""
-        bp = df['close'] - df[['low', 'close']].shift(1).min(axis=1)
-        tr = df[['high', 'close']].shift(1).max(axis=1).max() - df[['low', 'close']].shift(1).min(axis=1).min()
+        # Buying Pressure
+        bp = df['close'] - pd.concat([df['low'], df['close'].shift(1)], axis=1).min(axis=1)
 
+        # True Range
+        high_close = pd.concat([df['high'], df['close'].shift(1)], axis=1).max(axis=1)
+        low_close = pd.concat([df['low'], df['close'].shift(1)], axis=1).min(axis=1)
+        tr = high_close - low_close
+
+        # Averages
         avg1 = bp.rolling(period1).sum() / tr.rolling(period1).sum()
         avg2 = bp.rolling(period2).sum() / tr.rolling(period2).sum()
         avg3 = bp.rolling(period3).sum() / tr.rolling(period3).sum()

@@ -35,22 +35,33 @@ class TimeframeAggregator:
 
     MAX_BARS_PER_TIMEFRAME = 250  # Keep last 250 bars
 
-    def __init__(self, db_path: str = "data_output/binance_data.db",
-                 output_dir: str = "data_multi_timeframe"):
+    def __init__(self, db_path: str = None,
+                 output_dir: str = None):
         """
         Initialize TimeframeAggregator
 
         Args:
-            db_path: Path to source 1m data database
-            output_dir: Directory to store multi-timeframe parquet files
+            db_path: Path to source 1m data database (default: auto-detect)
+            output_dir: Directory to store multi-timeframe parquet files (default: auto-detect)
         """
-        self.db_path = db_path
-        self.output_dir = Path(output_dir)
+        # Auto-detect paths relative to this script's location
+        script_dir = Path(__file__).parent
+
+        if db_path is None:
+            self.db_path = str(script_dir / "data_output" / "binance_data.db")
+        else:
+            self.db_path = db_path
+
+        if output_dir is None:
+            self.output_dir = script_dir / "data_multi_timeframe"
+        else:
+            self.output_dir = Path(output_dir)
+
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         logger.info(f"TimeframeAggregator initialized")
-        logger.info(f"Source DB: {db_path}")
-        logger.info(f"Output Dir: {output_dir}")
+        logger.info(f"Source DB: {self.db_path}")
+        logger.info(f"Output Dir: {self.output_dir}")
         logger.info(f"Timeframes: {list(self.TIMEFRAMES.keys())}")
 
     def aggregate_candles(self, df_1m: pd.DataFrame, timeframe_minutes: int) -> pd.DataFrame:
