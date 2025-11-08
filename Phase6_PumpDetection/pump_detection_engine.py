@@ -492,7 +492,7 @@ class PumpDetectionEngine:
 
         return filtered_signals
 
-    def _get_data(self, symbol: str, exchange: str, limit: int) -> Optional[pd.DataFrame]:
+    def _get_data(self, symbol: str, exchange: str, lookback_bars: int = 120) -> Optional[pd.DataFrame]:
         """Veritabanından veri çek"""
         try:
             conn = sqlite3.connect(self.db_path)
@@ -503,7 +503,7 @@ class PumpDetectionEngine:
                 ORDER BY timestamp DESC
                 LIMIT ?
             """
-            df = pd.read_sql_query(query, conn, params=(symbol, exchange, limit))
+            df = pd.read_sql_query(query, conn, params=(symbol, exchange, lookback_bars))
             conn.close()
 
             if df.empty:
