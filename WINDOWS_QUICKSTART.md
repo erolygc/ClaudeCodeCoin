@@ -10,19 +10,35 @@ git pull origin claude/dev-project-update-011CUo3BwULJ7Rmb8JqRuqhd
 
 ### **Adım 2: Sistemi Başlat**
 
-**Yöntem A: Python ile**
+**🆕 Yöntem A: Çoklu Pencere (ÖNERİLEN) ⭐**
+
+Her komponent ayrı pencerede açılır - daha iyi izleme!
+
+```powershell
+.\START_SYSTEM_MULTIWINDOW.bat
+```
+
+Çift tıklayarak da çalıştırabilirsiniz! Scanner ve Trading Engine ayrı pencerelerde açılır.
+
+---
+
+**Yöntem B: Python ile (Çoklu Pencere)**
+
+```powershell
+python start_system_multiwindow.py
+```
+
+---
+
+**Yöntem C: Tek Pencere (Klasik)**
 
 ```powershell
 python start_trading_system_windows.py
-```
-
-**Yöntem B: Batch dosyası ile**
-
-```powershell
+# veya
 .\START_SYSTEM.bat
 ```
 
-Çift tıklayarak da çalıştırabilirsiniz!
+Tüm loglar tek pencerede birleşik gösterilir.
 
 ### **Adım 3: İzle**
 
@@ -42,37 +58,72 @@ Get-Content logs\paper_trading.log -Wait -Tail 20
 
 ## 🎮 Kullanım Modları
 
-### **Otomatik (Top 50 Coin)**
+### **🆕 Çoklu Pencere Modu (ÖNERİLEN)**
+
+#### **Otomatik (Top 50 Coin)**
+
+```powershell
+.\START_SYSTEM_MULTIWINDOW.bat
+# veya
+python start_system_multiwindow.py
+```
+
+Açılan pencereler:
+- **Pencere 1:** Hybrid Scanner (Pump detection)
+- **Pencere 2:** Paper Trading Engine (Trade management)
+- **Ana Pencere:** Master controller (Bilgilendirme)
+
+#### **Belirli Coinler**
+
+```powershell
+python start_system_multiwindow.py --coins BTC_USDT,ETH_USDT,SOL_USDT
+```
+
+#### **Top 20**
+
+```powershell
+python start_system_multiwindow.py --top 20
+```
+
+---
+
+### **Tek Pencere Modu (Klasik)**
+
+Tüm loglar birleşik:
 
 ```powershell
 python start_trading_system_windows.py
-```
-
-### **Sadece Büyük Coinler**
-
-```powershell
-python start_trading_system_windows.py --coins BTC_USDT,ETH_USDT,SOL_USDT
-```
-
-### **Top 20**
-
-```powershell
-python start_trading_system_windows.py --top 20
+# veya
+.\START_SYSTEM.bat
 ```
 
 ---
 
 ## 🛑 Durdurma
 
+### **Çoklu Pencere Modu:**
+
+**Her pencerede:**
+```
+Ctrl+C
+```
+
+**Veya tüm pencereleri kapat:**
+- Her terminal penceresinin X butonuna tıkla
+- Ya da tüm Python süreçlerini durdur:
+
+```powershell
+Stop-Process -Name python -Force
+```
+
+### **Tek Pencere Modu:**
+
 **Terminal'de:**
 ```
 Ctrl+C
 ```
 
-**Veya:**
-```powershell
-Stop-Process -Name python
-```
+Tüm servisler otomatik durur.
 
 ---
 
