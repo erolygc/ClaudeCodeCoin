@@ -212,7 +212,7 @@ class AdvancedSignalEngine:
         # Step 8: Create signal
         signal = AdvancedSignal(
             symbol=symbol,
-            timestamp=tf_data['1m']['datetime'].iloc[-1].isoformat() if '1m' in tf_data else "",
+            timestamp=str(tf_data['1m']['datetime'].iloc[-1]) if '1m' in tf_data else "",
             direction=direction,
             overall_confidence=overall_confidence,
             trend_score=scores['trend'],
