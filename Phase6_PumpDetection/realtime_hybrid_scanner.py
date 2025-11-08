@@ -11,6 +11,7 @@ import os
 import time
 import signal
 from datetime import datetime
+from pathlib import Path
 import logging
 
 # Add parent directory to path
@@ -18,11 +19,15 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from Phase6_PumpDetection.hybrid_pump_scanner import HybridPumpScanner
 
+# Create logs directory if it doesn't exist
+_log_dir = Path(__file__).parent.parent / "logs"
+_log_dir.mkdir(exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('logs/realtime_hybrid_scanner.log'),
+        logging.FileHandler(_log_dir / 'realtime_hybrid_scanner.log'),
         logging.StreamHandler()
     ]
 )

@@ -84,6 +84,12 @@ class HybridPumpScanner:
         self.advanced_min_confidence = advanced_min_confidence
         self.final_min_confidence = final_min_confidence
 
+        # Auto-detect database path if not provided
+        if db_path is None:
+            script_dir = Path(__file__).parent.parent
+            db_path = str(script_dir / "Phase1_DataCollection" / "data_output" / "binance_data.db")
+            logger.info(f"Auto-detected DB path: {db_path}")
+
         # Initialize engines
         logger.info("Initializing Pump Detection Engine...")
         self.pump_engine = PumpDetectionEngine(db_path)
