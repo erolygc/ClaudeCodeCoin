@@ -19,18 +19,23 @@ class IndicatorCalculator:
     Calculates 100+ technical indicators for OHLCV data
     """
 
-    def __init__(self, config_path: str = "indicators_config.yaml"):
+    def __init__(self, config_path: str = None):
         """
         Initialize indicator calculator
 
         Args:
-            config_path: Path to indicators YAML config
+            config_path: Path to indicators YAML config (default: auto-detect)
         """
+        if config_path is None:
+            # Auto-detect config path relative to this file
+            _script_dir = Path(__file__).parent
+            config_path = _script_dir / "indicators_config.yaml"
+
         self.config_path = Path(config_path)
         self.config = self._load_config()
 
         logger.info(f"IndicatorCalculator initialized")
-        logger.info(f"Config: {config_path}")
+        logger.info(f"Config: {self.config_path}")
         logger.info(f"Categories: {list(self.config.keys())}")
 
     def _load_config(self) -> Dict:

@@ -5,10 +5,16 @@ Uses 100+ indicators across multiple timeframes for high-accuracy signals
 
 import pandas as pd
 import numpy as np
+import os
+import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 import logging
+
+# Add current directory to path for imports
+_current_dir = Path(__file__).parent
+sys.path.insert(0, str(_current_dir))
 
 from timeframe_aggregator import TimeframeAggregator
 from indicator_calculator import IndicatorCalculator
