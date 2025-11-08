@@ -523,8 +523,14 @@ class AdvancedSignalEngine:
 
     def _calculate_levels(self, tf_data: Dict[str, pd.DataFrame], direction: str) -> Tuple[float, float, float]:
         """Calculate entry, stop loss, and take profit levels"""
-        # Use 1m for entry
-        df = tf_data.get('1m') or tf_data.get('5m') or list(tf_data.values())[0]
+        # Use 1m for entry, fallback to other timeframes
+        if '1m' in tf_data:
+            df = tf_data['1m']
+        elif '5m' in tf_data:
+            df = tf_data['5m']
+        else:
+            df = list(tf_data.values())[0]
+
         latest = df.iloc[-1]
 
         entry_price = float(latest['close'])
