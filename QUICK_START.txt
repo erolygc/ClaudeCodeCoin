@@ -1,0 +1,183 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║          ClaudeCodeCoin - HIZLI BAŞLANGIÇ REHBERİ                   ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+📋 SİSTEMİ SIFIRDAN BAŞLATMA (5 ADIM)
+═══════════════════════════════════════════════════════════════════════
+
+ADIM 1: MEVCUT SİSTEMİ DURDUR
+─────────────────────────────────────────
+Eğer sistem çalışıyorsa:
+→ Trading Engine penceresinde CTRL + C
+→ Dashboard penceresini kapat
+→ Tüm pencereleri kapat
+
+
+ADIM 2: SİSTEMİ SIFIRLA (Opsiyonel - İlk Kez İçin)
+─────────────────────────────────────────
+Çift tıkla:
+→ RESET_SYSTEM.bat
+
+Bu şunları yapar:
+✓ Tüm pozisyonları siler
+✓ Bakiyeyi $10,000'a sıfırlar
+✓ Log dosyalarını temizler
+✓ Alert'leri siler
+
+
+ADIM 3: SİSTEMİ BAŞLAT
+─────────────────────────────────────────
+Çift tıkla:
+→ START_AUTO_TRADING_SIMPLE.bat
+
+veya
+
+PowerShell'de:
+→ cd C:\Users\Botai\Desktop\Projeler\ClaudeCodeCoin
+→ .\START_AUTO_TRADING_SIMPLE.bat
+
+
+ADIM 4: DASHBOARD'U AÇ
+─────────────────────────────────────────
+Tarayıcıda:
+→ http://localhost:8501
+
+Görecekleriniz:
+✓ Bakiye: $10,000
+✓ Açık Pozisyonlar
+✓ Pump Alertleri
+✓ Canlı Grafikler
+
+
+ADIM 5: BEKLEYİN & İZLEYİN
+─────────────────────────────────────────
+İlk sinyal: 5-30 dakika içinde
+Trading Engine'de göreceksiniz:
+→ [SCANNER] Scanning coins...
+→ [ALERT] Pump detected...
+→ [OPEN] Pozisyon açılıyor...
+
+═══════════════════════════════════════════════════════════════════════
+🎮 HIZLI KOMUTLAR
+═══════════════════════════════════════════════════════════════════════
+
+BAŞLAT:
+  START_AUTO_TRADING_SIMPLE.bat
+
+SIFIRLA:
+  RESET_SYSTEM.bat
+
+DURDUR:
+  CTRL + C (Trading Engine penceresinde)
+
+DASHBOARD:
+  http://localhost:8501
+
+MANUEL BAŞLATMA:
+  python start_trading_system_windows.py --top 50
+
+AYARLARI DEĞİŞTİR:
+  notepad Phase7_PaperTrading\config.py
+
+═══════════════════════════════════════════════════════════════════════
+⚙️ SİSTEM AYARLARI
+═══════════════════════════════════════════════════════════════════════
+
+Dosya: Phase7_PaperTrading\config.py
+
+Önemli Parametreler:
+┌─────────────────────────────────────────────────────────────────┐
+│ INITIAL_BALANCE = 10000.0          # Başlangıç bakiyesi        │
+│ MAX_OPEN_POSITIONS = 15            # Max açık pozisyon          │
+│ STOP_LOSS_PERCENT = 5.0            # Stop loss %5               │
+│ MIN_CONFIDENCE_TO_TRADE = 50.0     # Min %50 confidence         │
+│ AUTO_CLOSE_AFTER_MINUTES = 45      # 45 dk sonra kapat          │
+└─────────────────────────────────────────────────────────────────┘
+
+Değiştirdikten sonra sistemi yeniden başlatın!
+
+═══════════════════════════════════════════════════════════════════════
+🔍 SORUN GİDERME
+═══════════════════════════════════════════════════════════════════════
+
+PROBLEM: Dashboard açılmıyor
+→ Port kullanımda mı kontrol et: netstat -ano | findstr :8501
+→ Process'i öldür: taskkill /F /PID <PID>
+→ Yeniden başlat: streamlit run dashboard.py
+
+PROBLEM: Hiç sinyal gelmiyor
+→ NORMAL! Pump sinyalleri zaman alabilir (5-60 dk)
+→ Scanner çalışıyor mu? Log'lara bak
+→ Ayarları gevşet: MIN_CONFIDENCE_TO_TRADE = 30.0
+
+PROBLEM: Pozisyon açılmıyor
+→ Fiyat verisi var mı? python CHECK_COLLECTORS.py
+→ Database dolu mu? data_output/binance_data.db kontrol et
+
+═══════════════════════════════════════════════════════════════════════
+📊 SİSTEM DURUMU KONTROL
+═══════════════════════════════════════════════════════════════════════
+
+Genel durum:
+→ python SYSTEM_STATUS_CHECK.py
+
+Collector durumu:
+→ python CHECK_COLLECTORS.py
+
+Pump alerts:
+→ python CHECK_PUMP_ALERTS.py
+
+Paper trading:
+→ python CHECK_PAPER_TRADING_STATUS.py
+
+Logları görüntüle:
+→ Get-Content logs\paper_trading.log -Tail 50
+
+═══════════════════════════════════════════════════════════════════════
+📁 ÖNEMLİ DOSYALAR
+═══════════════════════════════════════════════════════════════════════
+
+Başlatıcılar:
+  START_AUTO_TRADING_SIMPLE.bat      # Ana başlatıcı
+  RESET_SYSTEM.bat                   # Sıfırlama
+  dashboard.py                       # Dashboard
+
+Ayarlar:
+  Phase7_PaperTrading/config.py      # Trading ayarları
+
+Database:
+  Phase7_PaperTrading/data_output/paper_trading.db
+
+Loglar:
+  logs/paper_trading.log             # Trading logları
+  logs/hybrid_scanner.log            # Scanner logları
+
+Alerts:
+  pump_alerts/pump_alerts_YYYYMMDD.json
+
+═══════════════════════════════════════════════════════════════════════
+✅ İLK ÇALIŞTIRMA CHECKLİST
+═══════════════════════════════════════════════════════════════════════
+
+[ ] 1. RESET_SYSTEM.bat çalıştırıldı
+[ ] 2. START_AUTO_TRADING_SIMPLE.bat başlatıldı
+[ ] 3. Dashboard açıldı (http://localhost:8501)
+[ ] 4. Trading Engine logları akıyor
+[ ] 5. Scanner çalışıyor (PID gösterildi)
+[ ] 6. İlk sinyal bekleniyor
+
+═══════════════════════════════════════════════════════════════════════
+💡 İPUÇLARI
+═══════════════════════════════════════════════════════════════════════
+
+✓ İlk sinyal için sabırlı olun (5-60 dakika normal)
+✓ Volatil saatlerde test edin (UTC 12:00-20:00)
+✓ config.py dosyasını düzenleyerek optimize edin
+✓ Logları sürekli takip edin
+✓ Dashboard her 30 saniyede otomatik yenilenir
+
+═══════════════════════════════════════════════════════════════════════
+
+Detaylı bilgi için: START_GUIDE.md dosyasına bakın
+
+Başarılar! 🚀
