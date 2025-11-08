@@ -11,7 +11,7 @@ Write-Host ""
 $pythonProcesses = Get-Process python -ErrorAction SilentlyContinue
 
 if ($pythonProcesses) {
-    Write-Host "🐍 Python Processes:" -ForegroundColor Green
+    Write-Host "[PYTHON] Python Processes:" -ForegroundColor Green
     Write-Host ""
 
     $pythonProcesses | ForEach-Object {
@@ -29,18 +29,18 @@ if ($pythonProcesses) {
             $component = "Unknown"
             if ($commandLine -like "*realtime_hybrid_scanner*") {
                 $component = "Hybrid Scanner"
-                Write-Host "  🔍 $component" -ForegroundColor Yellow
+                Write-Host "  [SCANNER] $component" -ForegroundColor Yellow
             }
             elseif ($commandLine -like "*paper_trading_futures_engine*") {
                 $component = "Paper Trading Engine"
-                Write-Host "  💰 $component" -ForegroundColor Green
+                Write-Host "  [TRADING] $component" -ForegroundColor Green
             }
             elseif ($commandLine -like "*streamlit*" -or $commandLine -like "*dashboard*") {
                 $component = "Trading Dashboard"
-                Write-Host "  📊 $component" -ForegroundColor Magenta
+                Write-Host "  [DASHBOARD] $component" -ForegroundColor Magenta
             }
             else {
-                Write-Host "  ❓ Other Python Process" -ForegroundColor Gray
+                Write-Host "  [OTHER] Other Python Process" -ForegroundColor Gray
             }
 
             Write-Host "     PID: $processId" -ForegroundColor White
@@ -51,7 +51,7 @@ if ($pythonProcesses) {
             Write-Host ""
         }
         catch {
-            Write-Host "  ❓ Python Process (PID: $processId)" -ForegroundColor Gray
+            Write-Host "  [OTHER] Python Process (PID: $processId)" -ForegroundColor Gray
             Write-Host "     Memory: ${memoryMB} MB" -ForegroundColor Gray
             Write-Host ""
         }
@@ -60,7 +60,7 @@ if ($pythonProcesses) {
     Write-Host "Total Python Processes: $($pythonProcesses.Count)" -ForegroundColor Cyan
 }
 else {
-    Write-Host "❌ No Python processes running" -ForegroundColor Red
+    Write-Host "[!] No Python processes running" -ForegroundColor Red
 }
 
 Write-Host ""
@@ -72,10 +72,10 @@ Write-Host ""
 # Check if Streamlit dashboard is accessible
 try {
     $response = Invoke-WebRequest -Uri "http://localhost:8501" -TimeoutSec 2 -UseBasicParsing -ErrorAction Stop
-    Write-Host "✅ Dashboard is RUNNING at http://localhost:8501" -ForegroundColor Green
+    Write-Host "[OK] Dashboard is RUNNING at http://localhost:8501" -ForegroundColor Green
 }
 catch {
-    Write-Host "❌ Dashboard is NOT accessible" -ForegroundColor Red
+    Write-Host "[!] Dashboard is NOT accessible" -ForegroundColor Red
 }
 
 Write-Host ""
