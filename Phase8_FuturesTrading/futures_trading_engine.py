@@ -66,7 +66,8 @@ class FuturesTradingEngine:
         )
 
         # Alert monitoring
-        self.alerts_dir = Path("../pump_alerts")
+        _base_dir = Path(__file__).parent.parent  # Go up to project root
+        self.alerts_dir = _base_dir / "pump_alerts"
         self.processed_alerts = set()
         self.last_alert_check = 0
         self.alert_check_interval = 5  # Check every 5 seconds
@@ -77,7 +78,7 @@ class FuturesTradingEngine:
         self.price_update_interval = 5
 
         # Database connection
-        self.db_path = "../data_output/binance_data.db"
+        self.db_path = str(_base_dir / "Phase1_DataCollection" / "data_output" / "binance_data.db")
 
         # Statistics
         self.total_signals_received = 0

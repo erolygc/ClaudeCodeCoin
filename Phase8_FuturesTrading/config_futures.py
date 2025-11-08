@@ -84,9 +84,11 @@ AUTO_CLOSE_AFTER_MINUTES = 60  # 60 dakika sonra otomatik kapat
 # ============================================================================
 # DATABASE & LOGGING
 # ============================================================================
-TRADES_DB = "data_output/futures_trading.db"
-PERFORMANCE_LOG = "logs/futures_trading_performance.log"
-POSITION_HISTORY_LOG = "logs/futures_positions_history.json"
+import os
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TRADES_DB = os.path.join(_BASE_DIR, "data_output", "futures_trading.db")
+PERFORMANCE_LOG = os.path.join(_BASE_DIR, "logs", "futures_trading_performance.log")
+POSITION_HISTORY_LOG = os.path.join(_BASE_DIR, "logs", "futures_positions_history.json")
 
 # ============================================================================
 # SAFETY LIMITS
