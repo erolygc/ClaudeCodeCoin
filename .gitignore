@@ -194,3 +194,66 @@ celerybeat.pid
 
 # Pyre type checker
 .pyre/
+
+# ============================================================================
+# ClaudeCodeCoin Specific
+# ============================================================================
+
+# Backup folders
+backup_old_data/
+backup*/
+*_backup/
+*_old/
+
+# Trading data output
+Phase7_PaperTrading/data_output/*.db
+Phase8_FuturesTrading/data_output/*.db
+data_output/*.db
+
+# Pump alerts (keep template only)
+pump_alerts/*.json
+!pump_alerts/README.md
+
+# Logs directories
+Phase1_DataBackbone/logs/
+Phase6_PumpDetection/logs/
+Phase7_PaperTrading/logs/
+Phase8_FuturesTrading/logs/
+logs/*.log
+
+# Trading history exports
+*.xlsx
+exports/
+
+# Config backups
+*.config.bak
+*.py.bak
+
+# Windows specific
+Thumbs.db
+desktop.ini
+*.lnk
+
+# Temporary test files (root level only)
+/test_*.py
+/TEST_*.py
+/debug_*.py
+
+# Database journals
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Environment specific
+.env
+.env.local
+.env.*.local
+
+# IDE specific settings
+.claude/
+.cursor/
+
+# Performance profiling
+*.prof
+*.lprof
+profile_output/
