@@ -1,0 +1,567 @@
+# ============================================================================
+# PROFESSIONAL TECHNICAL INDICATORS LIBRARY
+# 100+ Indicators with Parameters
+# ============================================================================
+
+# TREND INDICATORS (20)
+# ============================================================================
+trend:
+  # Moving Averages
+  - name: SMA
+    description: Simple Moving Average
+    params:
+      periods: [5, 10, 20, 50, 100, 200]
+
+  - name: EMA
+    description: Exponential Moving Average
+    params:
+      periods: [9, 12, 20, 26, 50, 100, 200]
+
+  - name: WMA
+    description: Weighted Moving Average
+    params:
+      periods: [10, 20, 50]
+
+  - name: HMA
+    description: Hull Moving Average
+    params:
+      periods: [9, 16, 25]
+
+  - name: VWMA
+    description: Volume Weighted Moving Average
+    params:
+      periods: [20, 50]
+
+  - name: DEMA
+    description: Double Exponential Moving Average
+    params:
+      periods: [20, 50]
+
+  - name: TEMA
+    description: Triple Exponential Moving Average
+    params:
+      periods: [20, 50]
+
+  # MACD Family
+  - name: MACD
+    description: Moving Average Convergence Divergence
+    params:
+      fast: 12
+      slow: 26
+      signal: 9
+
+  - name: MACD_Histogram
+    description: MACD Histogram
+    params:
+      fast: 12
+      slow: 26
+      signal: 9
+
+  # Directional Movement
+  - name: ADX
+    description: Average Directional Index
+    params:
+      period: 14
+
+  - name: DMI
+    description: Directional Movement Index
+    params:
+      period: 14
+
+  - name: Aroon
+    description: Aroon Indicator
+    params:
+      period: 25
+
+  - name: Aroon_Oscillator
+    description: Aroon Oscillator
+    params:
+      period: 25
+
+  # Other Trend
+  - name: Parabolic_SAR
+    description: Parabolic Stop and Reverse
+    params:
+      acceleration: 0.02
+      maximum: 0.2
+
+  - name: Supertrend
+    description: Supertrend Indicator
+    params:
+      period: 10
+      multiplier: 3.0
+
+  - name: Ichimoku
+    description: Ichimoku Cloud
+    params:
+      tenkan: 9
+      kijun: 26
+      senkou_b: 52
+
+  - name: Linear_Regression
+    description: Linear Regression Line
+    params:
+      period: 14
+
+  - name: TRIX
+    description: Triple Exponential Average
+    params:
+      period: 14
+
+  - name: Choppiness_Index
+    description: Choppiness Index
+    params:
+      period: 14
+
+  - name: ZigZag
+    description: ZigZag Indicator
+    params:
+      deviation: 5.0
+
+# MOMENTUM INDICATORS (25)
+# ============================================================================
+momentum:
+  # RSI Family
+  - name: RSI
+    description: Relative Strength Index
+    params:
+      periods: [7, 14, 21]
+
+  - name: Stochastic_RSI
+    description: Stochastic RSI
+    params:
+      rsi_period: 14
+      stoch_period: 14
+      k: 3
+      d: 3
+
+  # Stochastic
+  - name: Stochastic
+    description: Stochastic Oscillator
+    params:
+      k_period: 14
+      d_period: 3
+      smooth_k: 3
+
+  - name: Stochastic_Fast
+    description: Fast Stochastic
+    params:
+      k_period: 5
+      d_period: 3
+
+  # Williams
+  - name: Williams_R
+    description: Williams %R
+    params:
+      period: 14
+
+  # CCI
+  - name: CCI
+    description: Commodity Channel Index
+    params:
+      period: 20
+
+  # ROC Family
+  - name: ROC
+    description: Rate of Change
+    params:
+      periods: [5, 10, 20]
+
+  - name: ROCP
+    description: Rate of Change Percentage
+    params:
+      period: 10
+
+  - name: ROCR
+    description: Rate of Change Ratio
+    params:
+      period: 10
+
+  # Momentum
+  - name: MOM
+    description: Momentum
+    params:
+      period: 10
+
+  - name: CMO
+    description: Chande Momentum Oscillator
+    params:
+      period: 14
+
+  # Advanced Momentum
+  - name: Ultimate_Oscillator
+    description: Ultimate Oscillator
+    params:
+      period1: 7
+      period2: 14
+      period3: 28
+
+  - name: TSI
+    description: True Strength Index
+    params:
+      long: 25
+      short: 13
+      signal: 13
+
+  - name: KST
+    description: Know Sure Thing
+    params:
+      roc1: 10
+      roc2: 15
+      roc3: 20
+      roc4: 30
+
+  - name: Awesome_Oscillator
+    description: Awesome Oscillator
+    params:
+      fast: 5
+      slow: 34
+
+  - name: Accelerator_Oscillator
+    description: Accelerator Oscillator
+    params:
+      fast: 5
+      slow: 34
+
+  - name: Detrended_Price
+    description: Detrended Price Oscillator
+    params:
+      period: 20
+
+  - name: Klinger_Oscillator
+    description: Klinger Volume Oscillator
+    params:
+      fast: 34
+      slow: 55
+      signal: 13
+
+  - name: Relative_Vigor_Index
+    description: Relative Vigor Index
+    params:
+      period: 10
+
+  - name: PMO
+    description: Price Momentum Oscillator
+    params:
+      period1: 35
+      period2: 20
+
+  - name: PGO
+    description: Pretty Good Oscillator
+    params:
+      period: 14
+
+  - name: Elder_Ray_Bull
+    description: Elder Ray Bull Power
+    params:
+      period: 13
+
+  - name: Elder_Ray_Bear
+    description: Elder Ray Bear Power
+    params:
+      period: 13
+
+  - name: Fisher_Transform
+    description: Fisher Transform
+    params:
+      period: 10
+
+  - name: Inertia
+    description: Inertia Indicator
+    params:
+      period: 20
+
+# VOLATILITY INDICATORS (15)
+# ============================================================================
+volatility:
+  - name: ATR
+    description: Average True Range
+    params:
+      period: 14
+
+  - name: ATR_Percent
+    description: ATR as Percentage of Price
+    params:
+      period: 14
+
+  - name: True_Range
+    description: True Range
+    params: {}
+
+  - name: Bollinger_Bands
+    description: Bollinger Bands
+    params:
+      period: 20
+      std_dev: 2.0
+
+  - name: Bollinger_Width
+    description: Bollinger Bands Width
+    params:
+      period: 20
+      std_dev: 2.0
+
+  - name: Keltner_Channel
+    description: Keltner Channel
+    params:
+      period: 20
+      atr_period: 10
+      multiplier: 2.0
+
+  - name: Donchian_Channel
+    description: Donchian Channel
+    params:
+      period: 20
+
+  - name: Standard_Deviation
+    description: Standard Deviation
+    params:
+      period: 20
+
+  - name: Historical_Volatility
+    description: Historical Volatility
+    params:
+      period: 30
+
+  - name: Chandelier_Exit
+    description: Chandelier Exit
+    params:
+      period: 22
+      multiplier: 3.0
+
+  - name: Mass_Index
+    description: Mass Index
+    params:
+      period: 25
+
+  - name: Volatility_Ratio
+    description: Volatility Ratio
+    params:
+      fast: 6
+      slow: 100
+
+  - name: UI
+    description: Ulcer Index
+    params:
+      period: 14
+
+  - name: NATR
+    description: Normalized Average True Range
+    params:
+      period: 14
+
+  - name: Pivot_Points
+    description: Pivot Points (Standard)
+    params:
+      type: standard
+
+# VOLUME INDICATORS (20)
+# ============================================================================
+volume:
+  - name: OBV
+    description: On Balance Volume
+    params: {}
+
+  - name: OBV_Mean
+    description: OBV Moving Average
+    params:
+      period: 20
+
+  - name: VWAP
+    description: Volume Weighted Average Price
+    params: {}
+
+  - name: MFI
+    description: Money Flow Index
+    params:
+      period: 14
+
+  - name: AD_Line
+    description: Accumulation/Distribution Line
+    params: {}
+
+  - name: CMF
+    description: Chaikin Money Flow
+    params:
+      period: 20
+
+  - name: Force_Index
+    description: Force Index
+    params:
+      period: 13
+
+  - name: Ease_of_Movement
+    description: Ease of Movement
+    params:
+      period: 14
+
+  - name: Volume_RSI
+    description: Volume RSI
+    params:
+      period: 14
+
+  - name: Volume_ROC
+    description: Volume Rate of Change
+    params:
+      period: 14
+
+  - name: PVT
+    description: Price Volume Trend
+    params: {}
+
+  - name: NVI
+    description: Negative Volume Index
+    params: {}
+
+  - name: PVI
+    description: Positive Volume Index
+    params: {}
+
+  - name: VPT
+    description: Volume Price Trend
+    params: {}
+
+  - name: Chaikin_Oscillator
+    description: Chaikin Oscillator
+    params:
+      fast: 3
+      slow: 10
+
+  - name: Klinger_Volume
+    description: Klinger Volume Oscillator
+    params:
+      fast: 34
+      slow: 55
+
+  - name: Volume_Weighted_MACD
+    description: Volume Weighted MACD
+    params:
+      fast: 12
+      slow: 26
+      signal: 9
+
+  - name: VWMA
+    description: Volume Weighted Moving Average
+    params:
+      period: 20
+
+  - name: WAD
+    description: Williams Accumulation Distribution
+    params: {}
+
+  - name: Money_Flow_Multiplier
+    description: Money Flow Multiplier
+    params: {}
+
+# CUSTOM/HYBRID INDICATORS (20)
+# ============================================================================
+custom:
+  - name: Pump_Probability_Score
+    description: Custom pump detection score
+    params:
+      volume_threshold: 3.0
+      price_threshold: 10.0
+      timeframe: 5
+
+  - name: Whale_Activity_Index
+    description: Large volume transaction detection
+    params:
+      volume_multiplier: 5.0
+      period: 20
+
+  - name: Multi_TF_Trend_Strength
+    description: Multi-timeframe trend alignment
+    params:
+      timeframes: [5, 15, 60]
+
+  - name: Volume_Price_Divergence
+    description: Volume-Price divergence detection
+    params:
+      period: 14
+
+  - name: Composite_Momentum
+    description: Composite of RSI, MACD, Stoch
+    params:
+      rsi_period: 14
+      macd_fast: 12
+      macd_slow: 26
+
+  - name: Market_Regime
+    description: Trending vs Ranging market detection
+    params:
+      adx_threshold: 25
+      period: 14
+
+  - name: Volatility_Regime
+    description: Low/Medium/High volatility regime
+    params:
+      atr_period: 14
+      periods: [20, 50]
+
+  - name: Trend_Quality
+    description: Quality of current trend
+    params:
+      period: 50
+
+  - name: Support_Resistance_Strength
+    description: Support/Resistance level strength
+    params:
+      lookback: 100
+      tolerance: 0.02
+
+  - name: Breakout_Probability
+    description: Probability of breakout
+    params:
+      period: 20
+      volatility_factor: 2.0
+
+  - name: Mean_Reversion_Signal
+    description: Mean reversion opportunity
+    params:
+      bb_period: 20
+      bb_std: 2.0
+      rsi_threshold: 30
+
+  - name: Momentum_Acceleration
+    description: Rate of change of momentum
+    params:
+      period: 10
+
+  - name: Volume_Acceleration
+    description: Rate of change of volume
+    params:
+      period: 10
+
+  - name: Price_Efficiency_Ratio
+    description: Price movement efficiency
+    params:
+      period: 10
+
+  - name: Trend_Consistency
+    description: Trend consistency score
+    params:
+      period: 20
+
+  - name: Liquidity_Score
+    description: Market liquidity indicator
+    params:
+      period: 20
+
+  - name: Order_Flow_Imbalance
+    description: Buy/Sell pressure imbalance
+    params:
+      period: 14
+
+  - name: Smart_Money_Index
+    description: Smart money flow indicator
+    params:
+      period: 20
+
+  - name: Correlation_BTC
+    description: Correlation with BTC
+    params:
+      period: 30
+
+  - name: Correlation_ETH
+    description: Correlation with ETH
+    params:
+      period: 30

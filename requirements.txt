@@ -10,6 +10,7 @@ websocket-client==1.7.0         # WebSocket connections for real-time data
 pandas==2.1.4                   # Data manipulation
 numpy==1.26.2                   # Numerical computing
 requests==2.31.0                # HTTP requests
+pyarrow==14.0.1                 # Fast Parquet file format for multi-timeframe data
 
 # Phase 1: Technical Indicators (using built-in calculations)
 # ta-lib removed - requires C library installation
