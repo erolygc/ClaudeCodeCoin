@@ -74,16 +74,15 @@ class MultiWindowTradingSystem:
         except Exception as e:
             logger.error(f"❌ Database setup error: {e}")
 
-    def _launch_windows_terminal(self, title: str, command: list):
-        """Launch command in new Windows terminal"""
-        # Use start command to open new window
-        cmd = ['start', title, 'cmd', '/k'] + command
+    def _launch_windows_terminal(self, title: str, batch_file: str):
+        """Launch command in new Windows terminal using batch file"""
+        # Use start command with batch file - much more reliable on Windows
+        cmd = f'start "{title}" cmd /k {batch_file}'
 
-        # Run through cmd.exe
         subprocess.Popen(
-            ' '.join(cmd),
+            cmd,
             shell=True,
-            creationflags=subprocess.CREATE_NEW_CONSOLE if self.is_windows else 0
+            cwd=Path.cwd()
         )
 
     def _launch_linux_terminal(self, title: str, command: list):
@@ -122,8 +121,7 @@ class MultiWindowTradingSystem:
             if self.is_windows:
                 self._launch_windows_terminal(
                     "Hybrid Scanner",
-                    [sys.executable, "Phase6_PumpDetection/realtime_hybrid_scanner.py",
-                     "--interval", "30"]
+                    "run_scanner.bat"
                 )
             else:
                 self._launch_linux_terminal(
@@ -139,7 +137,7 @@ class MultiWindowTradingSystem:
             if self.is_windows:
                 self._launch_windows_terminal(
                     "Paper Trading Engine",
-                    [sys.executable, "Phase8_FuturesTrading/paper_trading_futures_engine.py"]
+                    "run_trading_engine.bat"
                 )
             else:
                 self._launch_linux_terminal(
