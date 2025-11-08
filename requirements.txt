@@ -20,7 +20,7 @@ requests==2.31.0                # HTTP requests
 # Kept only essential packages for active system
 
 # Gate.io Futures API
-gate-api==4.32.0                # Gate.io official API for futures trading
+gate-api==6.104.3               # Gate.io official API for futures trading (stable)
 
 # Scientific Computing (for indicators)
 scipy==1.11.4                   # Scientific computing
