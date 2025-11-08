@@ -29,9 +29,10 @@ class MultiWindowTradingSystem:
     Launch trading system with each component in separate window
     """
 
-    def __init__(self, top_coins=50, specific_coins=None):
+    def __init__(self, top_coins=50, specific_coins=None, with_dashboard=True):
         self.top_coins = top_coins
         self.specific_coins = specific_coins
+        self.with_dashboard = with_dashboard
         self.is_windows = platform.system() == 'Windows'
 
     def _print_banner(self):
@@ -145,6 +146,32 @@ class MultiWindowTradingSystem:
                     [sys.executable, "Phase8_FuturesTrading/paper_trading_futures_engine.py"]
                 )
 
+            time.sleep(2)
+
+            # Launch Dashboard (optional)
+            if self.with_dashboard:
+                logger.info("3️⃣  Launching Trading Dashboard in new window...")
+                if self.is_windows:
+                    self._launch_windows_terminal(
+                        "Trading Dashboard",
+                        "run_dashboard.bat"
+                    )
+                else:
+                    self._launch_linux_terminal(
+                        "Trading Dashboard",
+                        ["streamlit", "run", "dashboard.py", "--server.port", "8501", "--server.headless", "true"]
+                    )
+
+                time.sleep(3)  # Give dashboard time to start
+
+                # Open browser
+                logger.info("🌐 Opening dashboard in browser...")
+                try:
+                    import webbrowser
+                    webbrowser.open("http://localhost:8501")
+                except Exception as e:
+                    logger.warning(f"Could not open browser automatically: {e}")
+
             print("")
             print("="*80)
             print("✅ ALL COMPONENTS LAUNCHED IN SEPARATE WINDOWS")
@@ -153,6 +180,9 @@ class MultiWindowTradingSystem:
             print("You should now see:")
             print("  1️⃣  Window: Hybrid Scanner")
             print("  2️⃣  Window: Paper Trading Engine")
+            if self.with_dashboard:
+                print("  3️⃣  Window: Trading Dashboard (Streamlit)")
+                print("  🌐 Browser: http://localhost:8501")
             print("")
             print("📊 Monitor:")
             print("   - Logs: logs/")
@@ -211,6 +241,11 @@ def main():
         type=str,
         help='Specific coins to trade (comma-separated, e.g., BTC_USDT,ETH_USDT)'
     )
+    parser.add_argument(
+        '--no-dashboard',
+        action='store_true',
+        help='Do not launch dashboard (default: dashboard is launched)'
+    )
 
     args = parser.parse_args()
 
@@ -220,7 +255,8 @@ def main():
 
     system = MultiWindowTradingSystem(
         top_coins=args.top,
-        specific_coins=specific_coins
+        specific_coins=specific_coins,
+        with_dashboard=not args.no_dashboard
     )
 
     system.start()

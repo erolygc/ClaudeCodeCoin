@@ -18,14 +18,30 @@ REM Start Paper Trading Engine in new window
 echo Starting Paper Trading Engine...
 start "Paper Trading Engine" cmd /k run_trading_engine.bat
 
+REM Wait 2 seconds
+timeout /t 2 /nobreak >nul
+
+REM Start Trading Dashboard in new window
+echo Starting Trading Dashboard...
+start "Trading Dashboard" cmd /k run_dashboard.bat
+
+REM Wait 3 seconds for dashboard to initialize
+timeout /t 3 /nobreak >nul
+
+REM Open dashboard in browser
+echo Opening dashboard in browser...
+start http://localhost:8501
+
 echo.
 echo ================================================================================
 echo  ALL SYSTEMS STARTED IN SEPARATE WINDOWS
 echo ================================================================================
 echo.
 echo You should now see:
-echo   1. Window: Hybrid Scanner (Purple/Green terminal)
-echo   2. Window: Paper Trading Engine (Blue terminal)
+echo   1. Window: Hybrid Scanner
+echo   2. Window: Paper Trading Engine
+echo   3. Window: Trading Dashboard (Streamlit)
+echo   4. Browser: Dashboard at http://localhost:8501
 echo.
 echo Monitor:
 echo   - Logs: logs\
