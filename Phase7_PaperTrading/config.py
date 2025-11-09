@@ -20,9 +20,9 @@ TAKE_PROFIT_PERCENT = {
     'LOW': 10.0        # 30-50% confidence için %10 kar al
 }
 
-# Pozisyon Açma Kriterleri - PRODUCTION MODE (Yüksek Kalite)
-MIN_CONFIDENCE_TO_TRADE = 70.0  # PRODUCTION: %70 - Sadece güçlü sinyaller (1000 coin için)
-MIN_VOLUME_SPIKE = 800.0  # PRODUCTION: %800 - Gerçek pump'lar (yüksek doğruluk)
+# Pozisyon Açma Kriterleri - TEST MODE (For demonstration)
+MIN_CONFIDENCE_TO_TRADE = 70.0  # Minimum %70 confidence
+MIN_VOLUME_SPIKE = 0.0  # TEST: 0% - Accept all volume levels for demo
 
 # Pozisyon Boyutlandırma (Confidence'a göre)
 POSITION_SIZE_MULTIPLIER = {

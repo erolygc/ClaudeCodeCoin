@@ -1,0 +1,102 @@
+[
+  {
+    "symbol": "SOL_USDT",
+    "exchange": "gate.io",
+    "timestamp": "2025-11-09T09:27:15",
+    "signal_type": "price_surge",
+    "level": "medium",
+    "confidence": 52.801691181729566,
+    "price_change_pct": 11.400845590864783,
+    "volume_change_pct": -84.76454438975905,
+    "time_window_minutes": 5,
+    "current_price": 335.4315204636401,
+    "current_volume": 1432358.3763573735,
+    "indicators": {
+      "price_change_5m": 11.400845590864783,
+      "price_change_15m": 98.13859255894701,
+      "volume_ratio": 0.26338376799696744,
+      "rsi": 91.6660317164629
+    },
+    "message": "\ud83d\ude80 F\u0130YAT SURGE: %11.4 art\u0131\u015f (5 dakika)! RSI: 92"
+  },
+  {
+    "symbol": "PEPE_USDT",
+    "exchange": "gate.io",
+    "timestamp": "2025-11-09T09:30:14",
+    "signal_type": "price_surge",
+    "level": "critical",
+    "confidence": 110,
+    "price_change_pct": 52.28563739703982,
+    "volume_change_pct": 16.47086623740004,
+    "time_window_minutes": 5,
+    "current_price": 7.865356971382784e-05,
+    "current_volume": 12213333.397356737,
+    "indicators": {
+      "price_change_5m": 52.28563739703982,
+      "price_change_15m": 229.2418436826685,
+      "volume_ratio": 1.0195281449125633,
+      "rsi": 100.0
+    },
+    "message": "\ud83d\ude80 F\u0130YAT SURGE: %52.3 art\u0131\u015f (5 dakika)! RSI: 100"
+  },
+  {
+    "symbol": "WIF_USDT",
+    "exchange": "gate.io",
+    "timestamp": "2025-11-09T09:30:14",
+    "signal_type": "price_surge",
+    "level": "critical",
+    "confidence": 110,
+    "price_change_pct": 54.56615504467906,
+    "volume_change_pct": 36.103444977730014,
+    "time_window_minutes": 5,
+    "current_price": 13.137802585317269,
+    "current_volume": 13601656.31126103,
+    "indicators": {
+      "price_change_5m": 54.56615504467906,
+      "price_change_15m": 261.5657978423347,
+      "volume_ratio": 1.2570353413748128,
+      "rsi": 100.0
+    },
+    "message": "\ud83d\ude80 F\u0130YAT SURGE: %54.6 art\u0131\u015f (5 dakika)! RSI: 100"
+  },
+  {
+    "symbol": "BONK_USDT",
+    "exchange": "gate.io",
+    "timestamp": "2025-11-09T09:30:14",
+    "signal_type": "price_surge",
+    "level": "critical",
+    "confidence": 110,
+    "price_change_pct": 55.51289172729472,
+    "volume_change_pct": 1.5669079147192067,
+    "time_window_minutes": 5,
+    "current_price": 0.0001547250774676747,
+    "current_volume": 12203144.692612195,
+    "indicators": {
+      "price_change_5m": 55.51289172729472,
+      "price_change_15m": 267.74699981195084,
+      "volume_ratio": 1.0374084798960077,
+      "rsi": 100.0
+    },
+    "message": "\ud83d\ude80 F\u0130YAT SURGE: %55.5 art\u0131\u015f (5 dakika)! RSI: 100"
+  },
+  {
+    "symbol": "FLOKI_USDT",
+    "exchange": "gate.io",
+    "timestamp": "2025-11-09T09:30:14",
+    "signal_type": "price_surge",
+    "level": "critical",
+    "confidence": 110,
+    "price_change_pct": 51.09494215031203,
+    "volume_change_pct": 94.94585111309826,
+    "time_window_minutes": 5,
+    "current_price": 0.0008689293518853374,
+    "current_volume": 15104341.475441383,
+    "indicators": {
+      "price_change_5m": 51.09494215031203,
+      "price_change_15m": 223.6783909681071,
+      "volume_ratio": 1.36756095424267,
+      "rsi": 100.0
+    },
+    "message": "\ud83d\ude80 F\u0130YAT SURGE: %51.1 art\u0131\u015f (5 dakika)! RSI: 100"
+  }
+]
