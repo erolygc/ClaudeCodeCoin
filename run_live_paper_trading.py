@@ -42,13 +42,13 @@ def main():
     print("=" * 80)
     print()
 
-    # PRODUCTION MODE - Gerçek filtreler
+    # TEST MODE - Daha fazla sinyal görmek için
     config.MIN_CONFIDENCE_TO_TRADE = 70.0  # %70+ confidence
-    config.MIN_VOLUME_SPIKE = 800.0  # %800+ volume spike (gerçek pump'lar)
+    config.MIN_VOLUME_SPIKE = 100.0  # TEST: %100+ volume spike (daha fazla sinyal)
 
     logger.info("")
     logger.info("=" * 70)
-    logger.info("PRODUCTION MODE - LIVE TRADING")
+    logger.info("TEST MODE - LIVE TRADING (More Signals)")
     logger.info("=" * 70)
     logger.info(f"Min Confidence: {config.MIN_CONFIDENCE_TO_TRADE}%")
     logger.info(f"Min Volume Spike: {config.MIN_VOLUME_SPIKE}%")
