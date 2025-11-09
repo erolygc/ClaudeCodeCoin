@@ -218,7 +218,8 @@ class PaperTradingEngine:
         if volume_change == float('inf') or volume_change == '∞':
             volume_change = 10000.0  # Çok yüksek hacim artışı olarak kabul et
 
-        if volume_change < config.MIN_VOLUME_SPIKE:
+        # TEST MODE: MIN_VOLUME_SPIKE = 0 ise tüm volume seviyelerini kabul et
+        if config.MIN_VOLUME_SPIKE > 0 and volume_change < config.MIN_VOLUME_SPIKE:
             logger.info(f"   ⊘ {symbol}: Volume spike çok düşük ({volume_change:.0f}% < {config.MIN_VOLUME_SPIKE}%)")
             return False
 
