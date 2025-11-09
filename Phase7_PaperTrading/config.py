@@ -11,17 +11,17 @@ MAX_POSITION_SIZE_PERCENT = 10.0  # Portföyün maksimum %10'u tek işlemde
 MIN_POSITION_SIZE = 50.0  # Minimum işlem büyüklüğü (USD)
 MAX_OPEN_POSITIONS = 15  # Aynı anda açık olabilecek maksimum pozisyon sayısı (1000 coin için)
 
-# Stop Loss & Take Profit
-STOP_LOSS_PERCENT = 5.0  # %5 zarar durdur
+# Stop Loss & Take Profit - TEST MODE (Hızlı kapanma için düşük değerler)
+STOP_LOSS_PERCENT = 3.0  # %3 zarar durdur (daha sıkı)
 TAKE_PROFIT_PERCENT = {
-    'CRITICAL': 25.0,  # 85%+ confidence için %25 kar al (güçlü pump'lar)
-    'HIGH': 20.0,      # 70-85% confidence için %20 kar al
-    'MEDIUM': 15.0,    # 50-70% confidence için %15 kar al
-    'LOW': 10.0        # 30-50% confidence için %10 kar al
+    'CRITICAL': 10.0,  # 85%+ confidence için %10 kar al (hızlı kar realizasyonu)
+    'HIGH': 8.0,       # 70-85% confidence için %8 kar al
+    'MEDIUM': 6.0,     # 50-70% confidence için %6 kar al
+    'LOW': 5.0         # 30-50% confidence için %5 kar al
 }
 
-# Pozisyon Açma Kriterleri - TEST MODE (Gevşek şartlar)
-MIN_CONFIDENCE_TO_TRADE = 50.0  # TEST: %50 - Daha fazla sinyal için düşük eşik
+# Pozisyon Açma Kriterleri - TEST MODE (Çok Gevşek şartlar - Demo için)
+MIN_CONFIDENCE_TO_TRADE = 30.0  # TEST: %30 - Maksimum sinyal için çok düşük eşik
 MIN_VOLUME_SPIKE = 0.0  # TEST MODE: Volume şartı YOK - Sadece fiyat momentum yeterli
 
 # Pozisyon Boyutlandırma (Confidence'a göre)
