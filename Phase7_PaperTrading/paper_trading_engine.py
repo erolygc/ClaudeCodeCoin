@@ -153,16 +153,23 @@ class PaperTradingEngine:
 
             logger.info(f"📄 Alert dosyasından {len(alerts)} toplam alert okundu")
 
-            # Sadece son 10 dakika içindeki alert'leri al
-            recent_alerts = []
-            ten_mins_ago = datetime.now() - timedelta(minutes=10)
+            # TEST MODE: MIN_VOLUME_SPIKE=0 ise zaman filtresini devre dışı bırak
+            # PRODUCTION MODE: Sadece son 10 dakikadaki alert'leri al
+            if config.MIN_VOLUME_SPIKE == 0.0:
+                # TEST MODE: Tüm alertleri kabul et (zaman fark etmez)
+                recent_alerts = alerts
+                logger.info(f"⏰ TEST MODE: Tüm {len(alerts)} alert işlenecek (zaman filtresi devre dışı)")
+            else:
+                # PRODUCTION MODE: Sadece son 10 dakika
+                recent_alerts = []
+                ten_mins_ago = datetime.now() - timedelta(minutes=10)
 
-            for alert in alerts:
-                alert_time = datetime.fromisoformat(alert['timestamp'])
-                if alert_time >= ten_mins_ago:
-                    recent_alerts.append(alert)
+                for alert in alerts:
+                    alert_time = datetime.fromisoformat(alert['timestamp'])
+                    if alert_time >= ten_mins_ago:
+                        recent_alerts.append(alert)
 
-            logger.info(f"⏰ Son 10 dakikada {len(recent_alerts)} alert var")
+                logger.info(f"⏰ Son 10 dakikada {len(recent_alerts)} alert var")
 
             # Fiyat verisi olmayan coinleri filtrele
             valid_alerts = []
