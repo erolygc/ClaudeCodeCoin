@@ -107,7 +107,7 @@ def check_paper_trading():
     print("="*70)
 
     try:
-        db_path = Path("data_output/paper_trading.db")
+        db_path = Path("Phase7_PaperTrading/data_output/paper_trading.db")
         if not db_path.exists():
             print("[INFO] Paper trading henuz baslatilmamis")
             return True
