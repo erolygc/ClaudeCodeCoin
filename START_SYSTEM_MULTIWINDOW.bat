@@ -1,83 +1,65 @@
 @echo off
-title ClaudeCodeCoin - Master Controller
-echo ================================================================================
-echo  CLAUDECODECOIN - AUTOMATED TRADING SYSTEM (MULTI-WINDOW)
-echo ================================================================================
-echo.
-echo Starting all components in separate windows...
-echo.
-
-REM Start Hybrid Scanner in new window
-echo Starting Hybrid Scanner...
-start "Hybrid Scanner" cmd /k run_scanner.bat
-
-REM Wait 2 seconds
-timeout /t 2 /nobreak >nul
-
-REM Start Paper Trading Engine in new window
-echo Starting Paper Trading Engine...
-start "Paper Trading Engine" cmd /k run_trading_engine.bat
-
-REM Wait 2 seconds
-timeout /t 2 /nobreak >nul
-
-REM Start Trading Dashboard in new window
-echo Starting Trading Dashboard...
-start "Trading Dashboard" cmd /k run_dashboard.bat
-
-REM Wait 3 seconds for dashboard to initialize
-timeout /t 3 /nobreak >nul
-
-REM Open dashboard in browser
-echo Opening dashboard in browser...
-start http://localhost:8501
+chcp 65001 >nul
+title ClaudeCodeCoin - System Launcher
 
 echo.
-echo ================================================================================
-echo  ALL SYSTEMS STARTED IN SEPARATE WINDOWS
-echo ================================================================================
+echo ╔════════════════════════════════════════════════════════════════════════╗
+echo ║     ClaudeCodeCoin - Multi-Window Automated Trading System            ║
+echo ╚════════════════════════════════════════════════════════════════════════╝
 echo.
-echo You should now see:
-echo   1. Window: Hybrid Scanner
-echo   2. Window: Paper Trading Engine
-echo   3. Window: Trading Dashboard (Streamlit)
-echo   4. Browser: Dashboard at http://localhost:8501
+echo Sistem Özellikleri:
+echo   💰 Başlangıç Bakiyesi: $10,000
+echo   📊 Pozisyon Boyutu: Max %%10 (portföy)
+echo   🎯 Max Açık Pozisyon: 15
+echo   🛑 Stop Loss: %%5
+echo   ✅ Take Profit: %%10-25
+echo   📈 Min Confidence: %%50
 echo.
-echo Monitor:
-echo   - Logs: logs\
-echo   - Signals: Phase6_PumpDetection\signals\
-echo   - Performance: paper_trading_performance.db
+echo ════════════════════════════════════════════════════════════════════════
 echo.
-echo To stop the system:
-echo   - Close each window manually
-echo   - Or press Ctrl+C in each window
-echo.
-echo ================================================================================
-echo.
-echo Press any key to show log monitoring options...
-pause >nul
+echo [1/5] Virtual environment hazırlanıyor...
+call venv\Scripts\activate.bat
+
+echo [2/5] Dashboard başlatılıyor (Pencere 1)...
+start "📊 Dashboard - ClaudeCodeCoin" cmd /k "title 📊 Dashboard - ClaudeCodeCoin && echo. && echo ═════════════════════════════════════════ && echo    📊 DASHBOARD BAŞLATILIYOR && echo ═════════════════════════════════════════ && echo. && echo Dashboard URL: http://localhost:8501 && echo. && echo Bu pencereyi KAPATMAYIN! && echo ═════════════════════════════════════════ && echo. && cd /d C:\Users\Botai\Desktop\Projeler\ClaudeCodeCoin && venv\Scripts\activate.bat && streamlit run dashboard.py"
+
+timeout /t 3 >nul
+
+echo [3/5] Hybrid Scanner başlatılıyor (Pencere 2)...
+start "🔍 Hybrid Scanner - ClaudeCodeCoin" cmd /k "title 🔍 Hybrid Scanner - ClaudeCodeCoin && color 0A && echo. && echo ═════════════════════════════════════════ && echo    🔍 HYBRID PUMP SCANNER && echo ═════════════════════════════════════════ && echo. && echo Tarama aralığı: 30 saniye && echo Minimum confidence: %%50 && echo Volume spike threshold: 0%% && echo. && echo Bu pencereyi KAPATMAYIN! && echo ═════════════════════════════════════════ && echo. && cd /d C:\Users\Botai\Desktop\Projeler\ClaudeCodeCoin && venv\Scripts\activate.bat && python Phase6_PumpDetection/realtime_hybrid_scanner.py --interval 30"
+
+timeout /t 3 >nul
+
+echo [4/5] Paper Trading Engine başlatılıyor (Pencere 3)...
+start "💰 Trading Engine - ClaudeCodeCoin" cmd /k "title 💰 Trading Engine - ClaudeCodeCoin && color 0B && echo. && echo ═════════════════════════════════════════ && echo    💰 PAPER TRADING ENGINE && echo ═════════════════════════════════════════ && echo. && echo Başlangıç bakiyesi: $10,000 && echo Max pozisyon: 15 && echo Stop Loss: %%5 && echo Take Profit: %%10-25 && echo. && echo Bu pencereyi KAPATMAYIN! && echo ═════════════════════════════════════════ && echo. && cd /d C:\Users\Botai\Desktop\Projeler\ClaudeCodeCoin && venv\Scripts\activate.bat && python Phase7_PaperTrading/paper_trading_engine.py"
+
+timeout /t 3 >nul
+
+echo [5/5] Real-time Monitor başlatılıyor (Pencere 4)...
+start "📈 System Monitor - ClaudeCodeCoin" cmd /k "title 📈 System Monitor - ClaudeCodeCoin && color 0E && echo. && echo ═════════════════════════════════════════ && echo    📈 REAL-TIME SYSTEM MONITOR && echo ═════════════════════════════════════════ && echo. && echo 30 saniyede bir otomatik güncelleme && echo. && echo Bu pencereyi KAPATMAYIN! && echo ═════════════════════════════════════════ && echo. && cd /d C:\Users\Botai\Desktop\Projeler\ClaudeCodeCoin && venv\Scripts\activate.bat && python REAL_TIME_MONITOR.py"
+
+timeout /t 2 >nul
 
 echo.
-echo ================================================================================
-echo  LOG MONITORING OPTIONS
-echo ================================================================================
+echo ════════════════════════════════════════════════════════════════════════
 echo.
-echo Option 1: Watch Trading Logs (PowerShell)
-echo   .\watch_logs.ps1 logs\paper_trading.log
+echo ✅ TÜM SİSTEMLER BAŞLATILDI!
 echo.
-echo Option 2: Watch Scanner Logs (PowerShell)
-echo   .\watch_logs.ps1 logs\realtime_hybrid_scanner.log
+echo Açılan Pencereler:
+echo   📊 Pencere 1: Dashboard (http://localhost:8501)
+echo   🔍 Pencere 2: Hybrid Scanner (Yeşil)
+echo   💰 Pencere 3: Paper Trading Engine (Mavi)
+echo   📈 Pencere 4: Real-time Monitor (Sarı)
 echo.
-echo Option 3: Manual tail (PowerShell)
-echo   Get-Content logs\paper_trading.log -Wait -Tail 20
+echo Sistem Kontrolleri:
+echo   • CHECK_SYSTEM.bat - Sistem sağlık kontrolü
+echo   • Dashboard - http://localhost:8501
 echo.
-echo Option 4: View signals
-echo   dir Phase6_PumpDetection\signals\
+echo ⚠️  Sistemi durdurmak için TÜM pencereleri kapatın
 echo.
-echo Option 5: Query database
-echo   sqlite3 paper_trading_performance.db "SELECT * FROM positions LIMIT 5"
+echo ════════════════════════════════════════════════════════════════════════
 echo.
-echo ================================================================================
+echo Bu pencereyi kapatabilirsiniz.
 echo.
-echo Press any key to exit this window...
-pause >nul
+
+pause
