@@ -79,14 +79,20 @@ class PaperTradingEngine:
             conn = sqlite3.connect(str(self.klines_db))
             cursor = conn.cursor()
 
-            # Son 5 dakika içindeki en son kapanış fiyatını al
-            five_mins_ago = (datetime.now() - timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
+            # TEST MODE: Daha eski fiyatları da kabul et (data collector çalışmayabilir)
+            # PRODUCTION MODE: Son 5 dakika
+            if config.MIN_VOLUME_SPIKE == 0.0:
+                # TEST MODE: Son 24 saat içindeki en son fiyat
+                time_ago = (datetime.now() - timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                # PRODUCTION MODE: Son 5 dakika (canlı fiyat gerekli)
+                time_ago = (datetime.now() - timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
 
             cursor.execute("""
                 SELECT close FROM klines
                 WHERE symbol = ? AND exchange = ? AND datetime >= ?
                 ORDER BY datetime DESC LIMIT 1
-            """, (symbol, exchange, five_mins_ago))
+            """, (symbol, exchange, time_ago))
 
             result = cursor.fetchone()
             conn.close()
@@ -113,13 +119,19 @@ class PaperTradingEngine:
             conn = sqlite3.connect(str(self.klines_db))
             cursor = conn.cursor()
 
-            # Son 10 dakika içinde veri var mı kontrol et
-            ten_mins_ago = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+            # TEST MODE: Daha eski verileri de kabul et (data collector çalışmayabilir)
+            # PRODUCTION MODE: Son 10 dakika
+            if config.MIN_VOLUME_SPIKE == 0.0:
+                # TEST MODE: Son 24 saat içindeki veriler yeterli
+                time_ago = (datetime.now() - timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                # PRODUCTION MODE: Son 10 dakika (canlı veri gerekli)
+                time_ago = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
 
             cursor.execute("""
                 SELECT COUNT(*) FROM klines
                 WHERE symbol = ? AND exchange = ? AND datetime >= ?
-            """, (symbol, exchange, ten_mins_ago))
+            """, (symbol, exchange, time_ago))
 
             result = cursor.fetchone()
             conn.close()
