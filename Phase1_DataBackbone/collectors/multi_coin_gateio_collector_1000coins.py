@@ -193,7 +193,13 @@ class GateIOCollector:
         """Start WebSocket connection"""
         logger.info(f"Connecting to Gate.io WebSocket...")
 
-        async with websockets.connect(self.ws_url) as websocket:
+        # Add headers to avoid 403 error
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Origin": "https://www.gate.io"
+        }
+
+        async with websockets.connect(self.ws_url, extra_headers=headers) as websocket:
             logger.info(f"Connected! Subscribing to {len(self.symbols)} symbols...")
 
             await self.subscribe_to_symbols(websocket)
